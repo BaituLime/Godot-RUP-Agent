@@ -1,5 +1,6 @@
 # Godot-RUP
 An archived experiment in building a highly planned OpenCode workflow for migrating Unity game systems into Godot, one module at a time.
+说白了我就是在Github找个坑给埋了，我已经把这个流程打磨的挺不错、好使了，可惜我发现了OMO，它更好使。
 ## Status
 This repository is currently **archived as an experiment**, not maintained as an actively recommended workflow.
 I am keeping it public mainly for:
