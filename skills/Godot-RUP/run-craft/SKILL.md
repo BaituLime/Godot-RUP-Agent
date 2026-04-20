@@ -22,8 +22,12 @@ Canonical reference:
 
 Read from:
 
+- the active handoff root and active run root first
 - one run-local packet
 - files explicitly named by that packet
+
+Treat the packet as authoritative for planning-artifact paths.
+If the packet carries planning-artifact references such as blueprint anchors or other handoff-root paths, resolve them from the active handoff root rather than guessing from the repo working tree.
 
 ## Write boundary
 
@@ -39,6 +43,7 @@ You may write only:
 - Work only in the assigned worker checkout.
 - Respect `role_contract` and `recent_execution_learnings[]` from the packet as bounded execution guidance.
 - If the packet carries a blueprint markdown anchor, start with that anchored slice first. Read other blueprint sections only when the craft scope honestly needs them.
+- Do not reopen planning artifacts from the repo working tree when the packet already names the authoritative handoff-root path.
 - This scope exists for Godot UI, scene, animation, and interaction work where editor or runtime feedback is part of implementation, not merely later proof.
 - You may do cheap local self-checks alongside craft work.
 - When the craft packet requires MCP or editor access, this scope starts and closes the editor for its own checkout.

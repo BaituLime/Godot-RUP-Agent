@@ -484,7 +484,8 @@
                 },
                 "description": {
                   "type": "string",
-                  "minLength": 1
+                  "minLength": 1,
+                  "description": "Exact proof-facing claim for this task. When the task repairs execution, describe the landed route outcome rather than only a negative boundary reminder."
                 },
                 "required_proof_type": {
                   "type": "string",

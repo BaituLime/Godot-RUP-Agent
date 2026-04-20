@@ -22,8 +22,12 @@ Canonical references:
 
 Read from:
 
+- the active handoff root and active run root first
 - one run-local packet
 - reviewed diffs, files, and evidence explicitly named by that packet
+
+Treat the packet as authoritative for planning-artifact paths.
+If the packet carries planning-artifact references such as blueprint anchors or other handoff-root paths, resolve them from the active handoff root rather than guessing from the repo working tree.
 
 ## Write boundary
 
@@ -38,6 +42,7 @@ You may write only:
 - After reading the packet, move directly to the listed review inputs and the raw attempt write path; do not broaden discovery beyond that bounded read set.
 - Respect `role_contract` and `recent_execution_learnings[]` from the packet as bounded execution guidance.
 - If the packet carries a blueprint markdown anchor, start with that anchored slice first. Read other blueprint sections only when the review scope honestly needs them.
+- Do not reopen planning artifacts from the repo working tree when the packet already names the authoritative handoff-root path.
 - Do not edit implementation code.
 - When the review packet requires MCP, this scope starts and closes the editor for its own checkout.
 - Do not treat "the editor is not already open" as a blocker for an MCP review scope. Opening the editor for the assigned checkout is part of this scope's normal work.

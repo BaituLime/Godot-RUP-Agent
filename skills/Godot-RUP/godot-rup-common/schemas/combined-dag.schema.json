@@ -63,7 +63,7 @@
           "scope_kind": {
             "type": "string",
             "enum": [
-              "task",
+              "execution",
               "craft",
               "proof",
               "review"

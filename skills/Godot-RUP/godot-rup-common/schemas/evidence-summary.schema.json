@@ -294,7 +294,7 @@
         "producer_command": {
           "type": "string",
           "enum": [
-            "godot-rup-task",
+            "godot-rup-execution",
             "godot-rup-craft",
             "godot-rup-proof",
             "godot-rup-review"

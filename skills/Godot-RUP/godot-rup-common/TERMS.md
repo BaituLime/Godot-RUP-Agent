@@ -23,12 +23,12 @@ language: C#
 - `Context Handoff`: stable project facts and tool discovery
 - `Use-Case Design`: approved operator-facing use-case contract at authoritative `use-cases/<module_id>.md` with companion index `use-cases/<module_id>.json`, sitting after context discovery and before architecture review
 - `Decision Handoff`: approved route, constraints, done semantics, and acceptance plan
-- `Blueprint Draft`: the current non-authoritative draft pair at `blueprint/<module_id>.draft.md` and `blueprint/<module_id>.draft.json`, written before blueprint gate approval and promoted away after approval
+- `Blueprint Landing Rehearsal`: the current non-authoritative route-only markdown at `blueprint/<module_id>.landing-rehearsal.md`, written before blueprint specification alignment
+- `Blueprint Draft`: the current non-authoritative aligned draft pair at `blueprint/<module_id>.draft.md` and `blueprint/<module_id>.draft.json`, written after landing rehearsal and before blueprint gate approval, then promoted away after approval
 - `Blueprint Draft Review`: one strict non-authoritative review of a blueprint draft, written to `/tmp/godot-rup-blueprint-review/<module_id>.md` and used as a real gate input before any `DG-BLUEPRINT-*` recommendation
 - `Execution Blueprint`: approved implementation-route rehearsal at authoritative `blueprint/<module_id>.md` with companion index `blueprint/<module_id>.json`, sitting after approved use-case design and approved route but before workflow/DAG compilation
 - `Key Use Case`: one operator-meaningful scenario approved in `Use-Case Design` before technical route selection begins
 - `Acceptance-Sensitive Behavior Claim`: one explicit behavior truth that later proof or acceptance must be able to judge as real, not infer from structure alone
-- `Implementation Route Step`: one authoritative prose preplay for one decisive implementation cut inside the markdown blueprint
 - `Shared Route Decision`: one implementation decision that only becomes obvious after the implementation route is understood together
 - `Realization Id`: one stable downstream reference anchor assigned to an implementation route step or a derived convergence route so `dag-plan` can cite blueprint truth without treating the companion index as the primary narrative
 - `Derived Parallelization And Convergence`: the part of the blueprint that records which rehearsed routes truly unlock parallel work and where they must converge back
@@ -41,7 +41,7 @@ language: C#
 - `Red Topo Layer`: a dependency-ready execution planning layer before review insertion
 - `Black Topo Layer`: a review-layer view formed after review targets are selected
 - `DG-USE-CASE-*`: the use-case-design gate entry family that records the approved key use cases and acceptance-sensitive behavior claims for one module
-- `DG-BLUEPRINT-*`: the execution-blueprint gate entry family that records the approved implementation route, coverage against approved use-case design, shared route decisions, and derived parallelization/convergence for one module
+- `DG-BLUEPRINT-*`: the blueprint-specification-alignment gate entry family that records the approved implementation route, coverage against approved use-case design, shared route decisions, and derived parallelization/convergence for one module
 - `DG-GRAPH-*`: the `Decision Handoff` gate entry family that records graph-shape review and approval state for one module
 - `Dispatch Pair`: the planning-owned joint selection `model_tier + reasoningEffort` for one scope; it must be judged together as one cost/risk/context choice rather than as two independent knobs
 - `proof_rigor`: the planning-owned declared evidence strength for one required proof input; allowed values are `smoke` and `strict`
@@ -75,7 +75,7 @@ language: C#
 - `Dispatch Weave` works by moving whole module layers later or earlier relative to other module layers; it does not cut tasks out of an admitted layer
 - `Dispatch Weave` is chosen by minimizing `peak worker-slot demand * combined topo DAG height`
 - `Epoch`: one admitted combined runtime wave containing whole admitted module layers
-- `Writer Scope`: a `task` or `craft` scope that produces implementation changes inside the assigned checkout
+- `Writer Scope`: an `execution` or `craft` scope that produces implementation changes inside the assigned checkout
 - `Fail-Fast Proof Dispatch`: the runtime rule that proof/review scopes should be launched in the minimum ready set, normally one at a time per admitted layer, and that later untouched sibling proof/review scopes should not be launched after the first same-layer raw attempt returns `partial` or `blocked`
 - `Integration Slot`: one fixed per-module integration worktree
 - `Worker Slot`: one global reusable writer worktree
@@ -93,16 +93,16 @@ language: C#
 
 ## Scope terms
 
-- `Task Scope`: a bounded ordinary implementation-producing runtime scope
+- `Execution Scope`: a bounded ordinary implementation-producing runtime scope
 - `Craft Scope`: a bounded Godot interactive implementation scope that may use editor or MCP-backed feedback to converge UI, scene, animation, or interaction work before final proof
 - `Proof Scope`: a bounded compile, headless, MCP, fixture, or harness-producing runtime scope
 - `Review Scope`: a bounded selected review scope
 - `kind`: semantic task-role metadata for execution/craft/proof/review classification; it is not part of the dispatch pair and may not substitute for `reasoningEffort`
-- `scope_kind`: packet/attempt discriminator for runtime scope class; allowed values are `task`, `craft`, `proof`, and `review`
+- `scope_kind`: packet/attempt discriminator for runtime scope class; allowed values are `execution`, `craft`, `proof`, and `review`
 - `graph_kind`: packet discriminator for the planning graph role that produced the scope; allowed values are `execution`, `craft`, `proof`, and `review`
-- `producer_skill`: raw-attempt discriminator naming the producer that wrote the attempt; allowed values are `run-task`, `run-craft`, `run-proof`, and `run-review`
+- `producer_skill`: raw-attempt discriminator naming the producer that wrote the attempt; allowed values are `run-execution`, `run-craft`, `run-proof`, and `run-review`
 - `Run Packet`: one run-local dispatch packet for one scope
-- `Raw Attempt`: producer output from `run-task`, `run-craft`, `run-proof`, or `run-review`
+- `Raw Attempt`: producer output from `run-execution`, `run-craft`, `run-proof`, or `run-review`
 - `Layer Settlement`: one drained layer's two-stage closure: `attest` then `gate`
 - `Integration Record`: one per-module layer integration action
 - `Acceptance Dossier`: the collected final module acceptance bundle
@@ -133,18 +133,3 @@ language: C#
 - `Acceptance Readback`: the explicit reread of current decision truth, graph truth, acceptance dossier, optional human-review record, and cited authoritative evidence before promoting a module to `accepted`
 - `Migration Preservation Claim`: an evidence-bearing claim that behavior, state meaning, serialized content, or upgrade semantics remain preserved across migration or version change unless planning truth explicitly approved an intentional change
 - `Pilot Verdict`: a workflow-level judgment over real shipped module outcomes; allowed values are `Keep`, `Fix`, and `Rollback`. It does not replace module status or top-level runtime phase truth.
-
-## Entry terms
-
-- `godot-rup-planner`: top-level planning agent surface
-- `godot-rup-runner`: top-level execution agent surface and runner shell
-- `godot-rup-acceptor`: top-level acceptance agent surface
-- `godot-rup-step`: manual single-slice entry
-- `orchestrate-runtime`: scheduler slice that must stay in the `Root Runner Context`; it may not be hosted inside a child agent
-- `godot-rup-prepare-packet`: same-context scheduler entry for one packet preparation
-- `godot-rup-settle-layer`: same-context scheduler entry for one drained layer settlement
-- `godot-rup-integrate-layer`: same-context scheduler entry for one gated module-layer integration
-- `godot-rup-task`: subagent-only task producer entry for one task packet
-- `godot-rup-craft`: subagent-only craft producer entry for one craft packet
-- `godot-rup-proof`: subagent-only proof producer entry for one proof packet
-- `godot-rup-review`: subagent-only review producer entry for one review packet

@@ -31,13 +31,18 @@ Use this for:
 
 ## 3. Blueprint artifacts
 
+`blueprint/<module_id>.landing-rehearsal.md`
+
+- current non-authoritative route-only landing rehearsal
+- source route truth before blueprint specification alignment
+
 `blueprint/<module_id>.draft.md`
 
-- current non-authoritative English blueprint draft
+- current non-authoritative aligned English blueprint draft
 
 `blueprint/<module_id>.draft.json`
 
-- current non-authoritative draft companion index
+- current non-authoritative aligned draft companion index
 
 `blueprint/<module_id>.md`
 
@@ -53,7 +58,9 @@ Use this for:
 
 Execution surfaces should prefer the exact authoritative markdown slice they need rather than reopening the whole blueprint.
 
-Pre-approval discussion should prefer the `*.draft.*` pair.
+Route-writing discussion should prefer `blueprint/<module_id>.landing-rehearsal.md`.
+
+Pre-approval review and gate work should prefer the `*.draft.*` pair.
 
 ## 4. Graph artifacts
 
@@ -65,6 +72,7 @@ Pre-approval discussion should prefer the `*.draft.*` pair.
 - must preserve `source_realization_ids[]` linkage for packet projection
 - carries accepted `proof_rigor` on acceptance inputs
 - may carry the active `repair_policy`
+- should express execution-facing repair scopes as planner-owned landing moves plus explicit preservation and forbidden-action fields, not as bare prohibition sentences that still leave the decisive route to worker invention
 
 `graph-history/<module_id>/...`
 

@@ -1,15 +1,12 @@
-# Execution Blueprint Self-Check
+# Blueprint Draft Self-Check
 
-Use this rubric internally while drafting the execution blueprint.
+Use this rubric internally while aligning the blueprint draft from an already-stabilized landing rehearsal.
 
 Do not turn it into a separate reviewer persona, a second conversation, or a user-facing `Why This Passes` section.
 
-Pair this self-check with:
+This rubric is for the approval-side draft after the first user check and after the user has already pointed out which parts are important and easy to get wrong and would cause rework.
 
-- `BLUEPRINT-REHEARSAL-TEMPLATE-V2.md`
-- `BLUEPRINT-EXAMPLE-GOOD.md`
-- `BLUEPRINT-EXAMPLE-BAD.md`
-- `BLUEPRINT-EXAMPLE-NOTES.md`
+It is not the tool for judging the first-check landing rehearsal.
 
 ## Auto-reject patterns
 
@@ -25,17 +22,24 @@ Reject and rewrite the blueprint draft if any of these are true:
 - It is really a requirements or order bundle wearing blueprint headings.
 - It turns the blueprint body into a one-by-one use-case FAQ even though the decisive route is really one shared implementation path.
 - A rehearsal explains the desired end-state before it explains the current repo friction that forced the route.
-- A rehearsal still reads like a decomposed composite order or specification sheet instead of a technical operator preplay.
-- A rehearsal never tells a weaker implementer where to start or what to cut first.
-- A rehearsal never names the tempting wrong route, so the likely downstream trap stays invisible.
+- A rehearsal still reads like a decomposed composite order or specification sheet instead of route prose.
+- A supposed step can mostly be paraphrased as "do X, avoid Y, get Z" without losing the core meaning.
+- A supposed step can be shuffled around without changing much meaning, which shows it is still a list rather than route prose.
+- One labeled route unit is still hiding several different first moves, several different local proofs, several different stop signs, or several different next-safe threads.
+- A rehearsal never tells a weaker implementer what they would actually do first tomorrow in this repo.
+- A rehearsal never gives the local sign that proves the current move is real.
+- A rehearsal never gives the wrong sign that means stop here.
+- A rehearsal never makes clear what becomes safe or possible next once the current move is done.
+- A rehearsal names a host, seam, contract, or boundary but never shows how work is handed forward through the next safe step.
 - The module establishes a root boundary, but the draft still leaves bootstrap owner, candidate-to-live swap, rebind order, or first safe live-runtime touch timing implicit.
 - The repo lacks the module's primary entry contract, but the draft still leaves that contract choice as an `Open Question`.
-- An `Open Question` would still change the first route cut, root ownership, candidate-vs-live boundary, or first safe live-runtime touch point.
+- An `Open Question` would still change the first practical step, root ownership, candidate-vs-live boundary, or first safe live-runtime touch point.
 - The supposed parallelization map is decorative rather than derived from the rehearsals.
 - It presents a neat outline, but a weaker downstream model would still have to invent the crucial route, authority, or conflict handling.
+- Even if the overall route reads coherently, its user-named important parts and user-named parts that are easy to get wrong and would cause rework are still only named abstractly instead of being preplayed almost to direct-implementation readiness.
 - Key state or authority ownership is still implicit.
 - Repo grounding is only a final reading list rather than being attached to the decisions it justifies.
-- It starts pre-cutting tasks, proof scopes, packet context, or dispatch choices.
+- It starts pre-defining tasks, proof scopes, packet context, or dispatch choices.
 - It stops because the document already looks tidy rather than because the hard route has been made clear.
 
 ## Pass conditions
@@ -47,13 +51,15 @@ The blueprint is strong enough for `DG-BLUEPRINT-*` only when all of these are t
 - The main body follows the decisive implementation route rather than collapsing into a FAQ-shaped use-case march.
 - The route has already been drafted at artifact quality before any user-facing summary tries to compress it.
 - Each approved use case is clearly covered by that route.
-- Each decisive route step clearly covers current-code friction, where to start, the first route cut, the post-cut route, the tempting wrong route, what must remain true, and repo grounding.
-- For boundary-establishing modules, the decisive rehearsals also make bootstrap, candidate, swap, rebind, and first safe live-runtime touch timing explicit.
+- The route structure is honest and does not depend on a forced scaffold.
+- Each real route unit makes explicit what to do now, what local sign proves it, what wrong sign means stop here, and what becomes safe next.
+- For boundary-establishing modules, the relevant rehearsals also make bootstrap, candidate, swap, rebind, and first safe live-runtime touch timing explicit.
 - Each rehearsal starts from current-code friction rather than from tidy route summary or desired end-state.
-- The rehearsals are allowed to be uneven in size; harder use cases should usually be longer.
+- The rehearsals are allowed to be uneven in size; harder parts should usually be longer.
+- The baseline mini bar still holds across the whole route, and the user-named important parts plus the user-named parts that are easy to get wrong and would cause rework are preplayed almost to direct-implementation readiness rather than flattened to the same abstraction level as easy connective steps.
 - Shared route decisions appear only after the rehearsals make them obvious.
 - Parallelization and convergence are derived from the rehearsals rather than imposed as decoration.
-- The hardest design judgment has already been decided inside the blueprint.
+- The most important design judgment has already been decided inside the blueprint.
 - The blueprint still leaves `dag-plan` real work to do: task decomposition, dependency compilation, proof planning, review placement, and dispatch selection.
 
 ## Self-check questions
@@ -61,17 +67,20 @@ The blueprint is strong enough for `DG-BLUEPRINT-*` only when all of these are t
 Ask these before surfacing `DG-BLUEPRINT-*`:
 
 - If a weaker execution model saw only this blueprint, would it still need to invent the most important route decision?
+- On the user-named important parts and the user-named parts that are easy to get wrong and would cause rework, is the route preplayed almost to direct-implementation readiness rather than merely named?
 - Is the approved use-case design being treated as input and coverage obligation rather than as the markdown body's main structure?
 - Does every key use case describe a real operator path rather than a capability area?
 - Does every rehearsal explain what current repo reality is fighting against?
-- Does every rehearsal make the first implementer move visible instead of hiding it behind end-state language?
-- Does the main body follow the order in which a real implementer would probably cut the repo?
+- Is every labeled route unit actually one coherent move, or is any tidy heading still hiding several different moves or proofs?
+- Does every real route unit make the current action, the local sign, the wrong sign, and the next safe move explicit?
+- Does the main body follow the order in which a real implementer would probably work through the repo?
 - Does every rehearsal reject at least one tempting but wrong route?
 - Would a weaker implementer know what the easiest wrong implementation would be and why it is wrong?
-- Would that implementer know where to start reading and what route cut must happen first?
+- Would that implementer know where to start reading, what to do first, what local sign proves it, and what becomes safe next?
+- Would that implementer know how work is handed forward after the current step instead of only knowing the desired end-state?
 - If the module creates or replaces a root boundary, would that implementer know who bootstraps it, when candidate state exists, when live runtime may first be touched, and how swap/rebind actually happens?
 - If the repo is missing the module's primary entry contract, has the blueprint already chosen the first honest repo-local contract route?
-- Can you point to the owner of each drift-prone state where the use case depends on one?
+- Can you point to the owner of each user-named state where ownership is easy to get wrong and would cause rework?
 - Is the parallelization/convergence section a result of the rehearsals, or did it appear first and force the shape?
 - If any decisive claim were challenged, can the blueprint point to the exact repo surfaces that justify it?
 
@@ -79,4 +88,5 @@ Ask these before surfacing `DG-BLUEPRINT-*`:
 
 - If any auto-reject pattern fires, revise the blueprint first.
 - Do not surface `DG-BLUEPRINT-*` until the draft survives this self-check.
+- If the route body itself needs substantive rewrite rather than local alignment repair, hand the module back to `blueprint-landing-rehearsal`.
 - If the missing clarity is upstream rather than local, route back to `architecture-review` or recommend a `spike`.

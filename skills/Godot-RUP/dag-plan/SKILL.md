@@ -6,7 +6,7 @@ compatibility: opencode
 
 # DAG Plan (Godot-RUP + C#)
 
-Use this Skill to build the execution graph for one Module after use-case design, architecture, execution-blueprint, and workflow decisions are approved.
+Use this Skill to build the execution graph for one Module after use-case design, architecture, blueprint specification alignment, and workflow decisions are approved.
 
 Canonical references:
 
@@ -53,7 +53,7 @@ Exception: when approved planning truth explicitly enables lawful same-route del
 - Compile the approved execution blueprint; do not reinvent the MVP structure from scratch.
 - Treat the authoritative blueprint markdown as source truth, and use the companion index only for stable ids and linkage. Every newly written task must map back to one or more `source_realization_ids[]`.
 - Use DAG planning to decompose the approved rehearsals and derived convergence routes into executable tasks, but do not erase or contradict the blueprint's route details, rejected tempting routes, failure handling, or convergence logic.
-- If a supposed realization id looks like disguised shared-route detail, decorative structure, or an under-rehearsed bucket, stop and return upstream to `execution-blueprint` instead of normalizing it into tasks.
+- If a supposed realization id looks like disguised shared-route detail, decorative structure, or an under-rehearsed bucket, stop and return upstream to `blueprint-specification-alignment` instead of normalizing it into tasks.
 - This phase owns the actual MVP cut. Prefer the smallest honest deliverable that proves the module is really moving in the approved direction.
 - First cut to MVP, then push safe parallelism as far as the real dependencies allow.
 - Unless tasks are truly mutually exclusive, dependency-coupled, or share the same mutable ownership boundary in a way that forbids concurrency, keep them parallel.
@@ -73,9 +73,11 @@ Exception: when approved planning truth explicitly enables lawful same-route del
 - In lawful same-route delegated delta planning, keep the delta inside one failing module and one existing realization neighborhood; do not spread the repair across unrelated realizations or modules.
 - Same-route delegated delta planning may add, split, resequence, or rerun scopes only to repair the failing implementation path and re-establish the already-approved proof path. It may not smuggle in new acceptance claims.
 - Same-route delegated delta planning may add stricter local checks or support scopes when they help satisfy the same acceptance contract, but it may not relax existing checks, remove required proof, or silently narrow the claim.
+- When writing or revising an `execution`, `craft`, or `review` scope for same-route repair, do not describe the scope only as a prohibition or locality guard. Write the planner-owned landing move that would actually repair the failing route, then let preservation and forbidden-action fields constrain that move.
+- If the only wording you can produce for a repair scope is essentially "keep X local", "do not switch Y early", or another negative boundary reminder, the route is still under-rehearsed. Re-rehearse the failing neighborhood or return upstream instead of freezing that sentence into graph truth.
 - If the superseding graph starts to look like a fresh redesign instead of a local repair continuation, stop and require visible replanning.
 - If the failure evidence shows the route itself is suspect or the repair would need broader workflow truth changes, stop and require visible replanning instead of pretending this still fits same-route delta law.
-- If the proposed DAG needs to merge, split, or resequence realizations in a way that contradicts the approved blueprint rehearsal rather than merely compiling it, stop and return upstream to `execution-blueprint` instead of silently mutating execution shape here.
+- If the proposed DAG needs to merge, split, or resequence realizations in a way that contradicts the approved blueprint rehearsal rather than merely compiling it, stop and return upstream to `blueprint-specification-alignment` instead of silently mutating execution shape here.
 
 ## Structured output rules
 
@@ -99,6 +101,7 @@ Every `tasks[].acceptance_inputs[]` entry must include:
 - `exactness_required`
 
 Do not leave task acceptance as prose-only reminders.
+Do not write execution-facing acceptance descriptions as pure boundary bans when a real reviewer would still need the landing move invented elsewhere.
 
 ## Dispatch planning rules
 

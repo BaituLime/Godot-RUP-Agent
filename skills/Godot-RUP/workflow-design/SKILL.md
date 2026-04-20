@@ -149,7 +149,8 @@ Before writing, make sure the accepted planning truth already states whether com
 ## Do not decide here
 
 - the key use cases and acceptance-sensitive behavior claims; those already belong to `use-case-design`
-- the rehearsals, shared route decisions, derived parallelization/convergence, or preplayed route details; those already belong to `execution-blueprint`
+- the landing rehearsal route body; that already belongs to `blueprint-landing-rehearsal`
+- shared route decisions, derived parallelization/convergence, or aligned blueprint package details; those already belong to `blueprint-specification-alignment`
 - concrete `Atomic Task` structure
 - `Red Topo Layer` or `Black Topo Layer` contents
 - per-task `model_tier` or `reasoningEffort`

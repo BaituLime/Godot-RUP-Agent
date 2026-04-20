@@ -74,6 +74,7 @@ That means:
 - expand to nearby or other blueprint sections only when the packet or the work honestly requires it
 
 Do not ignore the anchor and jump straight into a freeform whole-blueprint reread just because the worker feels uncertain.
+Do not reinterpret a packet-carried handoff-root planning path as a repo-working-tree path just because the current checkout has similarly named files.
 
 ## Handback rule
 

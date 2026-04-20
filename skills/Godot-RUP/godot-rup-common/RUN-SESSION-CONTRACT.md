@@ -170,7 +170,7 @@ Constrained runtime resources:
 
 `attempts/...`
 
-- raw, non-authoritative outputs from `run-task`, `run-craft`, `run-proof`, or `run-review`
+- raw, non-authoritative outputs from `run-execution`, `run-craft`, `run-proof`, or `run-review`
 - carry discriminator fields such as `scope_kind` and `producer_skill`
 - must include `dispatch_audit` with requested versus actual child model and subagent values plus dispatch verification
 - may include self-claim, logs, diff refs, raw check outputs, first blocker, optional `feedback_surface`, and optional structured `handoff_back`
@@ -225,7 +225,7 @@ Acceptance checkout:
 
 ## 5. Authority split
 
-`run-task`, `run-craft`, `run-proof`, and `run-review` are producers.
+`run-execution`, `run-craft`, `run-proof`, and `run-review` are producers.
 
 They may:
 
@@ -380,10 +380,10 @@ Receipt constraints:
 - `godot-rup-runner` is the top-level runner shell only
 - `orchestrate-runtime` is a scheduler only
 - runner phases `compose-runtime-dag -> allocate-worktrees -> orchestrate-runtime` stay in one session context
-- scheduler phases `prepare-packet -> child producer dispatch via the matching task/craft/proof/review producer prompt -> settle-layer -> integrate-layer` stay in one scheduler context
+- scheduler phases `prepare-packet -> child producer dispatch via the matching execution/craft/proof/review producer prompt -> settle-layer -> integrate-layer` stay in one scheduler context
 - matching same-context command entrypoints may exist for `prepare-packet`, `settle-layer`, and `integrate-layer`, but they do not change this one-context rule
 - a runner-owned dispatch-capability refresh may reopen `orchestrate-runtime` in a fresh context while preserving the same run session; that is runner continuity, not a new user stop or a new planning phase
-- the scheduler context is the `Root Runner Context`, not a child agent; `task` / `craft` / `proof` / `review` producers are the only first-level child agents in unattended execution
+- the scheduler context is the `Root Runner Context`, not a child agent; `execution` / `craft` / `proof` / `review` producers are the only first-level child agents in unattended execution
 - after each scheduler slice returns, the runner must reread `runs/<run_id>/session.json`, reread touched `runs/<run_id>/modules/<module_id>.json`, write `runs/<run_id>/scheduler-return.json`, and branch only from that reread state plus receipt; scheduler chat prose is explanatory only
 - before `orchestrate-runtime` yields control, it must reread `runs/<run_id>/session.json` plus every touched `runs/<run_id>/modules/<module_id>.json` and confirm the recorded state is either a real stop or a valid runner-handled yield
 - producer child dispatch must preserve the packet's planned `model_tier` and `reasoningEffort` by using its resolved dispatch fields `resolved_subagent_type`, `resolved_model`, and `resolved_reasoningEffort`; packet path by itself is not enough dispatch authority
@@ -394,7 +394,7 @@ Receipt constraints:
 - if the resolved child agent is unavailable, runtime must fail closed
 - producer child contexts are terminal leaves for this runtime; nested built-in subtask dispatch is not available there
 - MCP-consuming craft, proof, or review scopes own editor bootstrap and teardown locally; scheduler and packet glue may not require a separately pre-opened editor session as a hidden prerequisite
-- project-file production belongs only to `run-task`, `run-craft`, and `run-proof`
+- project-file production belongs only to `run-execution`, `run-craft`, and `run-proof`
 - proof/review dispatch should protect token budget by failing fast instead of speculatively burning an entire proof layer after the first decisive non-ready raw attempt
 - scheduler-owned runtime authority stops at `replan_needed`; any lawful same-route delegated delta planning belongs only to the runner shell after that real stop, and blocked-stop cleanup timing is runner-owned rather than scheduler-owned
 - authoritative settlement belongs only to `settle-layer`

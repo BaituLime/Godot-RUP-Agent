@@ -26,6 +26,7 @@ Canonical references:
 
 Read from:
 
+- the active handoff root and active run root first
 - approved planning truth
 - authoritative markdown `Execution Blueprint` plus companion index for the scope's `source_realization_ids[]`
 - `runs/<run_id>/slot-table.json`
@@ -44,6 +45,7 @@ You may write only:
 - Copy approved truth; do not reinterpret it.
 - Carry the assigned slot, checkout, module branch, approved `graph_revision_id`, approved joint dispatch pair `model_tier + reasoningEffort`, and resolved dispatch fields without reinterpretation.
 - Preserve planning-artifact path semantics from graph truth. Handoff planning files should stay handoff-root absolute; checkout-relative project paths should stay project-relative.
+- Do not rewrite handoff-root planning paths into repo-working-tree guesses while compiling the packet.
 - Current-format graph tasks must carry `source_realization_ids[]`; project the matching rehearsal-local execution truth into packet `source_realization_ids[]` plus a narrow but detail-rich `blueprint_excerpt`, and also carry the exact blueprint markdown anchor as `source_markdown_path + source_line_offset + source_line_length` so producer children know where to start reading first instead of freeforming from the whole blueprint.
 - If the graph carries blueprint linkage but the referenced blueprint revision or realization ids cannot be resolved cleanly, fail closed instead of fabricating a packet.
 - Resolve `producer_command` from the scope's producer kind and resolve that joint dispatch pair into `resolved_subagent_type`, `resolved_model`, and `resolved_reasoningEffort` from the active custom-agent table.

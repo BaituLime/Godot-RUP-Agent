@@ -25,7 +25,7 @@ This list is the scheduler's internal dependency set.
 - Interpreting a runner-level "use only these three skills" instruction as a ban on the scheduler's own internal dependencies is incorrect.
 
 - `prepare-packet`
-- `run-task`
+- `run-execution`
 - `run-craft`
 - `run-proof`
 - `run-review`
@@ -54,7 +54,7 @@ This list is the scheduler's internal dependency set.
 
 - Schedule from the combined DAG and dispatch weave, not from one module in isolation.
 - Run `prepare-packet`, `settle-layer`, and `integrate-layer` locally in this same scheduler context; if their internal command entrypoints are used, they must stay in this same context and may not open sibling child agents.
-- Dispatch producer children only as native OpenCode children for `task`, `craft`, `proof`, and `review` scopes, one packet per child.
+- Dispatch producer children only as native OpenCode children for `execution`, `craft`, `proof`, and `review` scopes, one packet per child.
 - Writer scopes may still fan out normally, but proof and review scopes are fail-fast by default and should launch only the minimum ready set needed to make progress.
 - After any proof or review raw attempt in a layer returns `partial` or `blocked`, do not launch untouched later sibling proof/review scopes in that layer.
 - Create each producer child with a short `description`, an authoritative producer `prompt` that includes the packet path, the packet's `resolved_subagent_type` passed through OpenCode's native `subagent_type` parameter, and optional `command = producer_command` for audit only.

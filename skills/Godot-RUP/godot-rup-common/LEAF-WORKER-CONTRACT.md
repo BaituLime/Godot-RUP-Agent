@@ -12,7 +12,7 @@ This document defines the active contract for bounded producer children in unatt
 
 This contract applies to:
 
-- `run-task`
+- `run-execution`
 - `run-craft`
 - `run-proof`
 - `run-review`
@@ -91,7 +91,7 @@ They may not convert their own output into authoritative evidence or settlement 
 
 ## 9. Role-specific handback discipline
 
-### `task`
+### `execution`
 
 - ordinary bounded implementation only
 - may not silently absorb `craft`, `proof`, or replanning work
@@ -115,7 +115,7 @@ They may not convert their own output into authoritative evidence or settlement 
 
 When a packet truthfully requires MCP or editor access for `craft`, `proof`, or `review`, that producer leaf owns the local lifecycle for its own bounded scope.
 
-Ordinary `task` work should not quietly rely on editor or MCP lifecycle as a hidden prerequisite.
+Ordinary `execution` work should not quietly rely on editor or MCP lifecycle as a hidden prerequisite.
 
 ## 11. Hard bans
 

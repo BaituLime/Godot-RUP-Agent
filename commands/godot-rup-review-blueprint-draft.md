@@ -14,10 +14,12 @@ Use the skill tool to load only this Skill:
 
 Do only this:
 
-1. resolve exactly one blueprint draft markdown path from `$ARGUMENTS` or the explicit child-dispatch request
-2. confirm the path is one `blueprint/<module_id>.draft.md`
-3. load only `blueprint-draft-review`
-4. execute exactly one strict review of that draft and write exactly one temporary review file
-5. return only the temporary review file path, findings count, and review verdict
+1. resolve the active handoff root first
+2. resolve exactly one blueprint draft markdown path from `$ARGUMENTS` or the explicit child-dispatch request
+3. confirm the path is either handoff-relative `blueprint/<module_id>.draft.md` or absolute `<handoff_root>/blueprint/<module_id>.draft.md`
+4. reject repo-working-tree resolution for the planning artifact path
+5. load only `blueprint-draft-review`
+6. execute exactly one strict review of that draft and write exactly one temporary review file
+7. return only the temporary review file path, findings count, and review verdict
 
 Do not revise the draft, broaden scope, guess missing planning truth, or use a happy-path review posture here.

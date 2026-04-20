@@ -30,7 +30,7 @@ The scheduler may do only this:
 
 1. read the combined runtime graph and weave
 2. prepare packets locally
-3. dispatch `task`, `craft`, `proof`, or `review` producer leaves
+3. dispatch `execution`, `craft`, `proof`, or `review` producer leaves
 4. wait only for already in-flight leaves
 5. settle drained layers locally
 6. integrate integration-gated layers locally
@@ -38,7 +38,7 @@ The scheduler may do only this:
 
 ## 4. Producer-child rule
 
-- dispatch only native OpenCode children for `run-task`, `run-craft`, `run-proof`, and `run-review`
+- dispatch only native OpenCode children for `run-execution`, `run-craft`, `run-proof`, and `run-review`
 - preserve packet `graph_revision_id`, role, and resolved dispatch fields
 - do not silently reroute to fallback profiles
 - producer leaves are terminal; no nested built-in subtask dispatch

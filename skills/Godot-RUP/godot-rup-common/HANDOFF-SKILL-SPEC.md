@@ -21,12 +21,13 @@ Authority split:
 - `Context Bundle`: repo facts and tools; writes `context/context.json`
 - `Use-Case Design Bundle`: approved operator-facing use-case contract; writes authoritative `use-cases/<module_id>.md`, companion `use-cases/<module_id>.json`, and immutable history under `use-cases-history/<module_id>/`
 - `Decision Bundle`: approved route and acceptance plan; writes `decision/<module_id>.json` and optional human-readable `decision/<module_id>.md`
-- `Execution Blueprint Bundle`: draft-first then approved implementation-route rehearsal; writes `blueprint/<module_id>.draft.md`, `blueprint/<module_id>.draft.json`, then after approval promotes to `blueprint/<module_id>.md`, `blueprint/<module_id>.json`, and immutable history under `blueprint-history/<module_id>/`
+- `Blueprint Landing Rehearsal Bundle`: route-only prepackaging rehearsal; writes `blueprint/<module_id>.landing-rehearsal.md`
+- `Blueprint Specification Alignment Bundle`: aligned draft-first then approved implementation-route package; writes `blueprint/<module_id>.draft.md`, `blueprint/<module_id>.draft.json`, then after approval promotes to `blueprint/<module_id>.md`, `blueprint/<module_id>.json`, and immutable history under `blueprint-history/<module_id>/`
 - `Blueprint Draft Review Bundle`: strict non-authoritative review of one blueprint draft; writes one temporary file under `/tmp/godot-rup-blueprint-review/`
 - `Graph Bundle`: approved module-local DAG; writes latest alias `graph/<module_id>.json` plus immutable history under `graph-history/<module_id>/`
 - `Run Session Bundle`: session, combined DAG, weave, slots, module state
 - `Run Packet Bundle`: one run-local packet
-- `Raw Attempt Bundle`: one task, craft, proof, or review attempt
+- `Raw Attempt Bundle`: one execution, craft, proof, or review attempt
 - `Settlement Bundle`: one drained layer settlement
 - `Integration Bundle`: one module-layer integration record
 - `Acceptance Dossier Bundle`: one module dossier
@@ -42,6 +43,8 @@ Authority split:
 - when a global rule changes, update the common docs first, then trim or align skill and top-level surface docs instead of copying the same rule across the tree
 - before reusing existing handoff artifacts, all skills must treat the active common docs plus current schemas as the first authority
 - when an existing handoff artifact conflicts with current `godot-rup-common/*.md` rules or active schemas, the common docs and schemas win; do not imitate stale handoff shape just because it is nearby
+- planning skills should not use other modules' blueprints, prior revision prose, or unrelated handoff artifacts as style or route exemplars; current-module upstream contracts are inputs, while common docs and active schemas remain the authority
+- when a planning skill is reading or reviewing planning artifacts such as `use-cases/...`, `decision/...`, or `blueprint/...`, it should resolve those paths from the active handoff root rather than from the current repo working tree; repo files are supporting implementation context, not the authority location for planning artifacts
 
 ## Top-level primary surfaces
 
@@ -59,7 +62,8 @@ Authority split:
 | `context-discovery` | Discover project facts and tools | `context/context.json` |
 | `use-case-design` | Record approved operator-facing use-case contract | `use-cases/<module_id>.md`, `use-cases/<module_id>.json`, `use-cases-history/<module_id>/<use_case_design_revision_id>.md`, `use-cases-history/<module_id>/<use_case_design_revision_id>.json` |
 | `architecture-review` | Record approved technical route | `decision/<module_id>.json`, `.md` |
-| `execution-blueprint` | Record draft-first then approved implementation-route rehearsal | `blueprint/<module_id>.draft.md`, `blueprint/<module_id>.draft.json`, then `blueprint/<module_id>.md`, `blueprint/<module_id>.json`, `blueprint-history/<module_id>/<blueprint_revision_id>.md`, `blueprint-history/<module_id>/<blueprint_revision_id>.json` |
+| `blueprint-landing-rehearsal` | Record the route-only landing rehearsal before packaging | `blueprint/<module_id>.landing-rehearsal.md` |
+| `blueprint-specification-alignment` | Align the stabilized landing rehearsal into the draft-first then approved blueprint package | `blueprint/<module_id>.draft.md`, `blueprint/<module_id>.draft.json`, then `blueprint/<module_id>.md`, `blueprint/<module_id>.json`, `blueprint-history/<module_id>/<blueprint_revision_id>.md`, `blueprint-history/<module_id>/<blueprint_revision_id>.json` |
 | `blueprint-draft-review` | Strictly review one blueprint draft and emit one temporary review file | `/tmp/godot-rup-blueprint-review/<module_id>.md` |
 | `workflow-design` | Record workflow shape and acceptance plan | `decision/<module_id>.json`, `.md` |
 | `dag-plan` | Record approved module-local DAG | `graph/<module_id>.json`, `graph-history/<module_id>/<graph_revision_id>.json`, decision graph-gate notes |
@@ -70,7 +74,7 @@ Authority split:
 | `orchestrate-runtime` | Schedule run scopes and internal next actions | `session.json`, `modules/<module_id>.json` |
 | `cleanup-run-worktrees` | Tear down run-scoped worker worktrees when a stopped run is being cleaned now | repo-local run worker worktrees, `runs/<run_id>/slot-table.json`, `runs/<run_id>/session.json` |
 | `prepare-packet` | Compile one run-local packet | `runs/<run_id>/packets/<module_id>/<scope_id>.json` |
-| `run-task` | Produce one implementation attempt | project files inside assigned checkout, one raw attempt |
+| `run-execution` | Produce one implementation attempt | project files inside assigned checkout, one raw attempt |
 | `run-craft` | Produce one interactive implementation convergence attempt | project files inside assigned checkout, one raw attempt |
 | `run-proof` | Produce one compile, headless, MCP, or harness attempt | project files when required, one raw attempt |
 | `run-review` | Produce one selected review attempt | one raw attempt |
@@ -92,7 +96,7 @@ Authority split:
 
 ## Internal producer command entrypoints
 
-- `godot-rup-task` is the canonical producer command label and direct/manual instruction mirror for exactly one task packet
+- `godot-rup-execution` is the canonical producer command label and direct/manual instruction mirror for exactly one execution packet
 - `godot-rup-craft` is the canonical producer command label and direct/manual instruction mirror for exactly one craft packet
 - `godot-rup-proof` is the canonical producer command label and direct/manual instruction mirror for exactly one proof packet
 - `godot-rup-review` is the canonical producer command label and direct/manual instruction mirror for exactly one review packet
@@ -119,11 +123,12 @@ Authority split:
 - `orchestrate-runtime` may not edit project files, call MCP directly, or write authoritative evidence
 - `repair-delta-plan` may write only lawful same-route planning artifacts; it may not write runtime state directly
 - `prepare-packet` may write only one run-local packet
-- `run-task`, `run-craft`, `run-proof`, and `run-review` may write only one raw attempt plus allowed checkout-local changes
+- `run-execution`, `run-craft`, `run-proof`, and `run-review` may write only one raw attempt plus allowed checkout-local changes
 - `settle-layer` is the first authority that may convert raw attempts into authoritative pass or rework state
 - `integrate-layer` may integrate one module-layer only
 - `cleanup-run-worktrees` may remove only run-scoped worker worktrees for one runner-selected stopped run and update run cleanup state
-- `execution-blueprint` may write only one approved blueprint alias pair plus any required archived prior revision pair
+- `blueprint-landing-rehearsal` may write only one ordinary landing rehearsal alias per module
+- `blueprint-specification-alignment` may write the current blueprint draft pair, may promote that pair into the approved blueprint alias pair plus any required archived prior revision pair, and may apply only bounded local repairs to the current landing rehearsal when no new route judgment is being added
 - `use-case-design` may write only one approved use-case-design alias pair plus any required archived prior revision pair
 - `assemble-acceptance-dossier` may not judge pass or fail
 - `prepare-user-review-brief` may write only one human-review brief, and only when planning truth requires at least one human-review track
@@ -139,21 +144,29 @@ Authority split:
 - `context-discovery` owns repo facts, tool discovery, proof-boundary facts, and unresolved factual blockers
 - `use-case-design` owns the approved key use cases, operator-facing success semantics, and acceptance-sensitive behavior claims before technical route approval begins
 - `architecture-review` owns the approved technical route and route-level constraints against the already-approved use-case-design truth
-- `execution-blueprint` owns the approved implementation route, coverage against approved use-case design, shared route decisions, and derived parallelization/convergence after both use-case-design and architecture route are approved
-- `execution-blueprint` may not surface `DG-BLUEPRINT-*` until the proposed blueprint survives the internal self-check in `godot-rup-common/BLUEPRINT-REVIEW-RUBRIC.md`
-- `execution-blueprint` should also perform an explicit blueprint gap analysis and choose one review-gate verdict before any `DG-BLUEPRINT-*` recommendation appears
-- `execution-blueprint` should reject decorative support branches, decomposed composite orders, and token-frugal summarization, and should use whatever repo context and response length are needed to make the route clear
-- `execution-blueprint` should write the authoritative blueprint artifacts in English, but should summarize recommendations to the user in concise Chinese unless the user explicitly asks for another language
-- `execution-blueprint` route steps should make the first implementer move and first route cut explicit enough that weaker downstream execution does not have to rediscover the route
-- `execution-blueprint` should derive the Chinese discussion summary from the current English `blueprint/<module_id>.draft.*` pair rather than using the discussion-summary shape as the blueprint-thinking scaffold
-- `execution-blueprint` should materialize that draft as `blueprint/<module_id>.draft.*` before any gate verdict, and should not leave `*.draft.*` beside approved aliases after promotion
-- `execution-blueprint` should run one fresh `godot-rup-review-blueprint-draft` pass against the current draft before any gate verdict, and should use that strict review as a real constraint rather than a ceremonial happy test
+- `blueprint-landing-rehearsal` owns the route-only landing rehearsal after both use-case-design and architecture route are approved
+- `blueprint-landing-rehearsal` should keep actions, hookups, local checks, and stop points as the paragraph skeleton instead of decision constraints, schema fields, or realization labels
+- `blueprint-landing-rehearsal` should preserve the route structure the module actually needs; it may use headings or route units only when they clarify the landing path, and it may not force a fixed `block -> section -> step -> substep` scaffold
+- `blueprint-landing-rehearsal` should write only `blueprint/<module_id>.landing-rehearsal.md`, stop for one user check before any self-check or child review, and let the user point out important easy-to-get-wrong parts plus obvious missing details
+- `blueprint-landing-rehearsal` should strengthen only those user-named parts and user-called-out issues; it may not write the draft pair, the approved pair, or surface `DG-BLUEPRINT-*`
+- `blueprint-specification-alignment` owns the aligned draft pair, the approved blueprint pair, coverage against approved use-case design, shared route decisions, derived parallelization/convergence, and the blueprint gate path
+- `blueprint-specification-alignment` must begin by screening the stabilized landing rehearsal before writing any draft pair; if the rehearsal is still fake preplay or the package would require new route judgment, it must stop before draft creation and return upstream with explicit mismatches
+- `blueprint-draft-review` must resolve the draft pair, landing rehearsal, and upstream module contract artifacts from the active handoff root before reading any repo surfaces; it may use repo files only to verify decisive route claims after the planning artifacts are already resolved
+- `blueprint-specification-alignment` must treat `blueprint/<module_id>.landing-rehearsal.md` as source route truth and may not rewrite that route body into a design sheet, result summary, schema-shaped package, or collapsed fake step list
+- `blueprint-specification-alignment` may apply only bounded local naming, bridge, duplicate-cleanup, user-requested, or consistency repairs to `blueprint/<module_id>.landing-rehearsal.md`; if a fix needs new route reasoning, new action order, new validation logic, new stop-point logic, or forced new structure, it must return upstream instead
+- `blueprint-specification-alignment` may not surface `DG-BLUEPRINT-*` until the aligned draft survives the internal self-check in `godot-rup-common/BLUEPRINT-REVIEW-RUBRIC.md`
+- `blueprint-specification-alignment` should also perform an explicit blueprint gap analysis and choose one review-gate verdict before any `DG-BLUEPRINT-*` recommendation appears
+- `blueprint-specification-alignment` should write the authoritative blueprint artifacts in English, but should describe recommendations to the user in Chinese with concrete route steps and decisive detail unless the user explicitly asks for another language
+- `blueprint-specification-alignment` should derive that Chinese route description from the current English draft pair rather than using the discussion-side shape as the blueprint-thinking scaffold
+- `blueprint-specification-alignment` should materialize `blueprint/<module_id>.draft.*` only after the landing rehearsal is already stable enough for packaging, and should not leave `*.draft.*` beside approved aliases after promotion
+- `blueprint-specification-alignment` should run exactly one strict child review pass per invocation; if review shows route-body rewrite is needed, it must return the module to `blueprint-landing-rehearsal` instead of patching forever or flattening the route into a specification list, and if review shows only local alignment issues it must stop and report them for user-directed continuation rather than auto-looping
+- `blueprint-specification-alignment` should give its Chinese report only after that review pass ends, whether the draft is now waiting for approval, needs user-directed local alignment repair, or must go back to `blueprint-landing-rehearsal`
 - `workflow-design` maps approved use-case semantics plus the approved route and approved execution blueprint to workflow steps, decision gates, and structured required evidence
 - `workflow-design` also decides whether `repair_policy` stays manual-only or allows lawful same-route delegated delta planning
 - `dag-plan` compiles the approved execution blueprint and workflow truth into the strict MVP task DAG, dependency truth, safe-parallelism shape, and active per-task dispatch settings
 - when `repair_policy` is present in approved decision truth, `dag-plan` must carry it forward into the approved graph without silently changing its guards
 - `repair-delta-plan` is the only planning skill that may supersede graph truth inside the unattended execution route, and only while same-route preservation still holds
-- `repair-delta-plan` may write `blueprint_plus_graph_delta` only when execution exposed insufficient same-route blueprint truth and the repaired graph is repinned honestly to that newer blueprint revision
+- `repair-delta-plan` may write `blueprint_plus_graph_delta` only when execution exposed insufficient same-route blueprint truth, the failing route neighborhood has been re-rehearsed by the planner strongly enough that downstream execution no longer has to invent the missing route there, and the repaired graph is repinned honestly to that newer blueprint revision
 - current-format graph writes are invalid unless they preserve blueprint linkage through top-level `source_blueprint_revision_id` and per-task `source_realization_ids[]`
 - active per-task dispatch planning is only the joint pair `model_tier + reasoningEffort`; choose that pair together, do not let task `kind` or any other semantic metadata replace `reasoningEffort`, and do not reintroduce retired keys such as `reasoning_effort`, `verbosity`, or planning-level `subagent_type`
 - planning must explicitly mark each required evidence and acceptance input as `proof_rigor = smoke` or `strict`; optimism may not hide in implicit defaults
@@ -183,21 +196,22 @@ Authority split:
 - producer scopes may self-claim only `ready_for_attest`, `partial`, or `blocked`
 - unattended execution may not use `direct_thread`
 - editor bootstrap and teardown belong to the MCP-consuming craft, proof, or review scope
-- ordinary `run-task` scopes should not rely on MCP/editor lifecycle as a primary execution dependency; if they do, planning likely should have classified them as `craft`
+- ordinary `run-execution` scopes should not rely on MCP/editor lifecycle as a primary execution dependency; if they do, planning likely should have classified them as `craft`
 - integration is always per module even when scheduling is combined across modules
 - weave may shift only whole module layers; partial layer admission is invalid
 - weave optimization objective is minimize `peak worker-slot demand * combined topo DAG height`
 - if an epoch is admitted, all of its admitted writer scopes must be dispatched
 - proof and review scopes are fail-fast by default: dispatch the minimum ready set, normally one scope at a time per admitted layer, rather than fanning out a whole proof/review layer speculatively
 - after any proof or review raw attempt in a layer returns `partial` or `blocked`, do not launch untouched later sibling proof/review scopes in that same layer; wait only for already-in-flight siblings, then settle the layer immediately
-- producer child dispatch should use the matching producer prompt template for `godot-rup-task`, `godot-rup-craft`, `godot-rup-proof`, or `godot-rup-review`, not a deleted top-level command surface
-- producer `task` / `craft` / `proof` / `review` scopes are first-level children from the root runner-owned scheduler context only; they may not become second-level children under a child-hosted scheduler
+- producer child dispatch should use the matching producer prompt template for `godot-rup-execution`, `godot-rup-craft`, `godot-rup-proof`, or `godot-rup-review`, not a deleted top-level command surface
+- producer `execution` / `craft` / `proof` / `review` scopes are first-level children from the root runner-owned scheduler context only; they may not become second-level children under a child-hosted scheduler
 - the scheduler must treat producer children as leaf workers, not as mini-schedulers
 - the scheduler must create producer children with the packet's resolved dispatch fields and authoritative producer prompt instead of falling back to a default child route
 - `dag-plan` owns the joint dispatch pair `model_tier + reasoningEffort`; runtime may not replace that pair with a different planning decision, but packet preparation may apply the explicit active resolver normalization table when selecting a concrete child profile
 - packet preparation owns resolving that joint dispatch pair into `resolved_subagent_type`, `resolved_model`, `resolved_reasoningEffort`, and `producer_command` before producer dispatch begins
 - packet preparation also pins `graph_revision_id` so later attempts and proofs stay tied to the exact approved DAG revision that produced them
 - for current-format graph truth, packet preparation must also preserve `source_blueprint_revision_id`, `source_realization_ids[]`, and a narrow but detail-rich `blueprint_excerpt` with an exact blueprint markdown anchor
+- producer commands and producer skills must resolve the active handoff root and active run root before accepting a packet path, and a producer may not reinterpret packet-carried handoff planning paths as repo-working-tree guesses just because similarly named files exist in the checkout
 - packet preparation must preserve approved `proof_rigor` on every carried acceptance input; runtime may not quietly downgrade strict proof obligations into smoke
 - if the resolved child agent is unavailable in the current OpenCode installation, runtime must fail closed instead of silently falling back to another agent
 - layer-local `rework_needed` means more execution is required, not that runtime hit an environment blocker
@@ -219,7 +233,7 @@ Authority split:
 - unattended execution requires an execution context that can write to the target repo and its repo-local worktrees
 - `manual_needed` is invalid when used only to cover the scheduler's failure to attempt producer dispatch in a valid execution context
 - layer-local quick checks are not where MCP should normally appear; MCP should be expressed as explicit craft, proof, or review scope work
-- if a proposed implementation scope genuinely needs editor-mediated authoring as its main action, do not smuggle that need in as an ordinary `run-task`; surface it as a planning decision or future dedicated producer shape
+- if a proposed implementation scope genuinely needs editor-mediated authoring as its main action, do not smuggle that need in as an ordinary `run-execution`; surface it as a planning decision or future dedicated producer shape
 - smoke checks may exist as auxiliary sanity only, but runtime and acceptance may not treat them as satisfying a strict proof obligation
 
 ## Active resolved execution profiles

@@ -18,7 +18,7 @@ Use the skill tool to load only the one explicitly requested slice from this lis
 Dedicated internal command entrypoints exist for these narrower machine-facing slices and should be invoked directly instead of routing through `godot-rup-step`:
 
 - `godot-rup-prepare-packet`
-- `godot-rup-task`
+- `godot-rup-execution`
 - `godot-rup-proof`
 - `godot-rup-review`
 - `godot-rup-settle-layer`

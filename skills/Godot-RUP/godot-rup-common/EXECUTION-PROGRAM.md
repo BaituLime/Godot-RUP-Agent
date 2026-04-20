@@ -36,7 +36,7 @@ Stop-type specifics such as blocked-stop cleanup deferral, same-route delegated 
 Clarification:
 
 - A runner-level instruction such as "use only `compose-runtime-dag`, `allocate-worktrees`, and `orchestrate-runtime`" constrains only the runner shell's top-level phase selection.
-- It does not prohibit `orchestrate-runtime` from invoking its documented scheduler-local dependencies such as `prepare-packet`, `run-task`, `run-craft`, `run-proof`, `run-review`, `settle-layer`, and `integrate-layer`.
+- It does not prohibit `orchestrate-runtime` from invoking its documented scheduler-local dependencies such as `prepare-packet`, `run-execution`, `run-craft`, `run-proof`, `run-review`, `settle-layer`, and `integrate-layer`.
 - It also does not prohibit the runner from invoking `repair-delta-plan` after a real `replan_needed` stop when approved `repair_policy` still allows lawful same-route delegated delta planning and the carried lineage delta bound is not exhausted.
 - Treating that runner-level restriction as a ban on the scheduler's internal phases is a runner error.
 - A command bridge or automation wrapper that launches execution inside a child agent is not a valid `Root Runner Context` for unattended execution.
@@ -70,7 +70,7 @@ Clarification:
 1. load `session.json`, `dispatch-weave.json`, `slot-table.json`, and `modules/*.json`
 2. identify the next admitted combined layer or epoch
 3. run `prepare-packet` locally for every ready scope that lacks a run-local packet
-4. dispatch only child subagents for `task`, `craft`, `proof`, or `review` scopes, one packet per child
+4. dispatch only child subagents for `execution`, `craft`, `proof`, or `review` scopes, one packet per child
 5. wait only for in-flight child scopes that this scheduler already dispatched
 6. run `settle-layer` locally when an admitted layer drains, including fail-fast drain after a decisive proof/review failure boundary
 7. when a drained layer gates to `rework_needed` and no preapproved repair continuation exists, stop with `current_phase = stopped`, `yield_reason = null`, and `stop_reason = replan_needed`; any same-route delegated delta planning belongs to the runner shell after that stop, and result-class judgment belongs to `repair-delta-plan`, not to the scheduler here
@@ -78,11 +78,11 @@ Clarification:
 9. before any return, reread `session.json` plus every touched `modules/<module_id>.json` and confirm the recorded state is either `current_phase = stopped` with a real `stop_reason` or `current_phase = orchestrating` with `yield_reason = dispatch_refresh_needed`
 10. any real stop written here must set `current_phase = stopped`, `yield_reason = null`, and the real `stop_reason`; otherwise recompute and continue until a reverse-gate-legal return state exists
 
-This scheduler must run only in the `Root Runner Context`. Producer `task` / `craft` / `proof` / `review` children are first-level children from that root. Running the scheduler inside a child agent is invalid because it turns producer dispatch into forbidden second-level child dispatch. When the top-level `run` surface was directly used by the user in the current conversation, runtime should assume that root context unless explicit contrary evidence exists. The runner owns the surface protocol and decides whether a returned scheduler slice may surface to the user.
+This scheduler must run only in the `Root Runner Context`. Producer `execution` / `craft` / `proof` / `review` children are first-level children from that root. Running the scheduler inside a child agent is invalid because it turns producer dispatch into forbidden second-level child dispatch. When the top-level `run` surface was directly used by the user in the current conversation, runtime should assume that root context unless explicit contrary evidence exists. The runner owns the surface protocol and decides whether a returned scheduler slice may surface to the user.
 
 Concrete producer dispatch payload:
 
-- task scope: child `prompt` carries the packet path plus the canonical `godot-rup-task` producer instructions; optional `command = godot-rup-task` is audit-only
+- execution scope: child `prompt` carries the packet path plus the canonical `godot-rup-execution` producer instructions; optional `command = godot-rup-execution` is audit-only
 - craft scope: child `prompt` carries the packet path plus the canonical `godot-rup-craft` producer instructions; optional `command = godot-rup-craft` is audit-only
 - proof scope: child `prompt` carries the packet path plus the canonical `godot-rup-proof` producer instructions; optional `command = godot-rup-proof` is audit-only
 - review scope: child `prompt` carries the packet path plus the canonical `godot-rup-review` producer instructions; optional `command = godot-rup-review` is audit-only
@@ -92,7 +92,7 @@ Concrete producer dispatch payload:
 - the child prompt, not the child `command` field, is authoritative for producer behavior
 - packet preparation must already have resolved the joint dispatch pair `model_tier + reasoningEffort` into `resolved_subagent_type`, `resolved_model`, and `resolved_reasoningEffort`; current active normalization is `mini + medium -> godot-rup-exec-mini-high`
 - packet preparation must also pin the exact planning source through `graph_revision_id`
-- current-format graph truth must carry execution-blueprint realization linkage, and packet preparation must project `source_realization_ids[]` plus a narrow but detail-rich `blueprint_excerpt` with an exact blueprint markdown path and line slice so producer children do not need the full blueprint artifact by default
+- current-format graph truth must carry approved blueprint realization linkage, and packet preparation must project `source_realization_ids[]` plus a narrow but detail-rich `blueprint_excerpt` with an exact blueprint markdown path and line slice so producer children do not need the full blueprint artifact by default
 - producer execution must respect packet-declared `proof_rigor`; a smoke sanity run may not be reported as if it satisfied a strict proof obligation
 - if the resolved child agent is unavailable, runtime must fail closed before dispatch
 
@@ -122,12 +122,12 @@ Concrete producer dispatch payload:
 
 ## 3. Scope producers
 
-`run-task`
+`run-execution`
 
 - produces code or content changes for one execution scope
 - may do cheap local self-checks
 - writes only raw attempt output
-- normally runs through a native child prompt equivalent to the canonical `godot-rup-task` instructions; runtime may mirror `command = godot-rup-task` for audit
+- normally runs through a native child prompt equivalent to the canonical `godot-rup-execution` instructions; runtime may mirror `command = godot-rup-execution` for audit
 - is a terminal producer child in practice; do not expect nested producer dispatch from inside it
 
 `run-craft`

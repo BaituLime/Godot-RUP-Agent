@@ -16,10 +16,10 @@ The runner shell delegates to bounded producer roles instead of treating every c
 
 ## Active producer roles
 
-### `task`
+### `execution`
 
 - purpose: bounded ordinary implementation change
-- producer skill: `run-task`
+- producer skill: `run-execution`
 - should not depend on editor or MCP lifecycle as a primary implementation resource
 
 ### `craft`
@@ -46,7 +46,7 @@ The runner shell and scheduler should delegate by role, not by vague capability 
 
 That means:
 
-- implementation work goes to `task` or `craft`
+- implementation work goes to `execution` or `craft`
 - evidence production goes to `proof`
 - judgment work goes to `review`
 
@@ -65,7 +65,7 @@ Learnings must stay narrow and execution-relevant.
 
 ## Forbidden role drift
 
-- `task` may not silently become `craft`
+- `execution` may not silently become `craft`
 - `craft` may not claim final proof or acceptance authority
 - `proof` may not silently rewrite implementation scope beyond bounded support work
 - `review` may not silently become a new planning phase

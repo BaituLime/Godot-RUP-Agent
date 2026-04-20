@@ -72,7 +72,7 @@ After writing `decision/<module_id>.json`, inspect it directly and confirm it st
 - split Atomic Tasks
 - define or redefine key use cases; that belongs to `use-case-design`
 - redefine operator-facing done semantics or experiential acceptance bar; carry them forward from the approved `Use-Case Design` unless the user explicitly regates that upstream truth
-- pre-split use-case realizations, task buckets, or task-local execution preflights; that belongs to `execution-blueprint`
+- route-only landing rehearsal, realization packaging, or task-local execution preflights; that belongs to `blueprint-landing-rehearsal` and `blueprint-specification-alignment`
 - assign per-task `model_tier` or `reasoningEffort`
 - choose review targets
 - set runtime slot counts

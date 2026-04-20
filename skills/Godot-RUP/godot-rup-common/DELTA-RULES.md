@@ -54,6 +54,8 @@ If any point is no or uncertain, fail closed to visible replanning.
 
 - lawful only when same-route blueprint truth is insufficient but route truth, acceptance bar, and `proof_rigor` remain unchanged
 - lawful only when `repair_policy.allow_blueprint_plus_graph_delta = true`
+- lawful only when `repair-delta-plan` re-rehearses the failing same-route neighborhood enough that downstream execution no longer has to invent the missing route detail there
+- not lawful when the supposed blueprint repair is only a warning, restriction, or abstract reminder that still leaves the decisive route to worker invention
 
 `escalate_visible_replanning`
 
@@ -99,3 +101,4 @@ Only then may the runner create a fresh successor run.
 - do not rewrite approved use-case or route truth
 - do not weaken acceptance evidence requirements
 - do not downgrade `proof_rigor`
+- do not treat sentence-tightening as a substitute for planner-owned route rehearsal when authoring `blueprint_plus_graph_delta`

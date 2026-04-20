@@ -33,6 +33,7 @@ This Skill owns only the finer result-class judgment and planning writes.
 
 Read from:
 
+- the active handoff root first
 - current `Decision Handoff`
 - current approved `Execution Blueprint`
 - current approved `Graph Handoff`
@@ -42,8 +43,11 @@ Read from:
 - the failing or insufficient evidence that triggered this repair planning step
 - the relevant run-session context that explains why ordinary continuation failed
 - counted prior same-route delta attempts for this unattended route
+- relevant repo surfaces only when needed to re-rehearse the failing same-route neighborhood honestly
 
 Do not rely on chat recap when current artifacts disagree.
+
+Do not guess planning-artifact paths from the repo working tree when the active handoff root already carries them.
 
 ## Write boundary
 
@@ -82,6 +86,25 @@ Do not emit standalone `blueprint_only`.
 
 If the only honest repair shape would require a result class that current `repair_policy` forbids, escalate visibly.
 
+## Blueprint delta repair rule
+
+When considering `blueprint_plus_graph_delta`, repair the blueprint by re-rehearsing the failing same-route neighborhood yourself.
+
+That rehearsal must start from:
+
+- the current failure evidence
+- the current repo friction at the failing surface
+- the current approved route truth
+- the unchanged acceptance bar and unchanged `proof_rigor`
+
+Write the superseding blueprint as if you were the next obedient implementer who had to land that same approved route now in this repo.
+
+The repaired blueprint must clear the exact route-invention gap that execution exposed.
+It must make the decisive current move, local sign, wrong-sign stop point, and next safe move explicit enough that downstream execution no longer has to invent the missing route at that point.
+
+If the only change you can honestly make is to append a warning, restriction, or abstract requirement while the implementer would still need to invent how to proceed, that is not yet an honest blueprint repair.
+Keep re-rehearsing the failing neighborhood or escalate visibly.
+
 ## Required judgments
 
 Before writing any lawful non-escalation result, explicitly judge:
@@ -93,6 +116,7 @@ Before writing any lawful non-escalation result, explicitly judge:
 - why `proof_rigor` remains unchanged
 - whether the counted delta history still looks convergent rather than cyclic
 - whether the carried result-class gate permits the chosen output
+- when choosing `blueprint_plus_graph_delta`, why the superseding blueprint now removes the exact missing route detail exposed by execution instead of merely tightening wording
 
 If any of those judgments fail, escalate visibly.
 
@@ -129,3 +153,4 @@ When returning in chat:
 - do not treat every invocation as a fresh first attempt when delta history says otherwise
 - do not write runtime state directly
 - do not widen, drop, or silently rewrite the carried `repair_policy` while writing a superseding graph
+- do not satisfy `blueprint_plus_graph_delta` by only adding a harder sentence, warning, or must-not-do line when the worker would still need to invent the decisive route

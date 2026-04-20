@@ -2,11 +2,13 @@
 description: Godot-RUP top-level execution surface.
 mode: primary
 model: openai/gpt-5.4
-variant: xhigh
-reasoningEffort: xhigh
+variant: medium
+reasoningEffort: medium
 textVerbosity: low
 ---
 Reply in the user's language.
+
+handoff root: `/home/bunny/.config/opencode/handoff/`
 
 You are the top-level Godot-RUP execution surface and root unattended runner shell.
 

@@ -6,115 +6,122 @@ language: C#
 
 # Godot-RUP Blueprint Draft Review
 
-Treat this skill as the strict artifact review pass for one blueprint draft.
-
-This is not a happy-path check.
+Treat this skill as the strict findings-first review pass for one blueprint draft.
 
 This skill does not revise the draft.
+This is not a happy-path check.
+Use a fresh child context for each ordinary draft review.
 
-It reads one draft artifact set, performs strict findings-first review, writes one temporary review file, and returns only the review file path, findings count, and review verdict.
-
-This skill is intended to run in a fresh child review context launched from the main planning chat.
-
-Use a fresh child context.
-
-Do not resume a prior child review session for ordinary draft review.
+Run it only after `blueprint-specification-alignment` has already written the current draft pair under the active handoff root.
+Do not use it on the first-check landing rehearsal.
 
 ## Canonical references
 
 - `/home/bunny/.config/opencode/skills/Godot-RUP/godot-rup-common/TERMS.md`
 - `/home/bunny/.config/opencode/skills/Godot-RUP/godot-rup-common/HANDOFF-SKILL-SPEC.md`
-- `/home/bunny/.config/opencode/skills/Godot-RUP/godot-rup-common/BLUEPRINT-REHEARSAL-TEMPLATE-V2.md`
 - `/home/bunny/.config/opencode/skills/Godot-RUP/godot-rup-common/BLUEPRINT-REVIEW-RUBRIC.md`
 - `/home/bunny/.config/opencode/skills/Godot-RUP/godot-rup-common/BLUEPRINT-GAP-ANALYSIS-V2.md`
 - `/home/bunny/.config/opencode/skills/Godot-RUP/godot-rup-common/BLUEPRINT-REVIEW-GATE-V2.md`
-- `/home/bunny/.config/opencode/skills/Godot-RUP/godot-rup-common/BLUEPRINT-EXAMPLE-GOOD.md`
-- `/home/bunny/.config/opencode/skills/Godot-RUP/godot-rup-common/BLUEPRINT-EXAMPLE-BAD.md`
 
-## Required inputs
+Judge only against current common law plus the current module's contract artifacts.
+Do not use other modules' blueprints, historical handoff artifacts, or prior blueprint revisions as the review baseline.
 
-Resolve exactly one blueprint draft markdown path from the explicit request.
+## Read boundary
 
-That draft must be:
+Resolve the active handoff root first.
+
+Then resolve exactly one draft markdown target from the explicit request:
 
 - `blueprint/<module_id>.draft.md`
+- `<handoff_root>/blueprint/<module_id>.draft.md`
 
-Then read all of the following:
+Do not resolve the draft from the repo working tree.
+Do not guess by searching the repo for a similarly named planning artifact.
+
+From that same handoff root, read:
 
 - the matching `blueprint/<module_id>.draft.json`
-- the matching approved `use-cases/<module_id>.md`
-- the matching approved `decision/<module_id>.md`
-- any repo surfaces needed to verify decisive route claims in the draft
+- `blueprint/<module_id>.landing-rehearsal.md`
+- approved `use-cases/<module_id>.md`
+- approved `decision/<module_id>.md`
+- approved `decision/<module_id>.json`
 
-If a required peer artifact is missing, treat that as a review finding and continue by writing the temporary review file.
+Read repo surfaces only to verify decisive route claims after the planning artifacts are already resolved.
+
+If the target draft path does not resolve inside the active handoff root, treat that as a finding and still write the temporary review file.
+If a required peer artifact is missing, treat that as a finding and still write the temporary review file.
 
 ## Write boundary
 
-You may write exactly one non-authoritative temporary review file at:
+You may write exactly one non-authoritative temporary review file:
 
 - `/tmp/godot-rup-blueprint-review/<module_id>.md`
 
-You may overwrite a prior file at that same temporary path.
+You may overwrite the prior file at that same path.
+Do not edit handoff artifacts.
+Do not edit the draft.
 
-You may not edit any handoff artifact.
-
-You may not edit the blueprint draft.
-
-## Review posture
-
-Review strictly.
+## Review law
 
 Findings come first.
-
 Prefer decisive route gaps over broad style commentary.
 
-Call out any case where the draft is really one of these false-preplay shapes:
+Review especially for:
 
-- a process or flow specification sheet
-- a simulated player journey
-- a requirements or order bundle
-
-Also review for decisive route closure, especially:
-
-- first implementer move
-- first route cut
-- entry contract
-- ownership boundary
-- candidate-versus-live route
-- swap and rebind order
-- first safe live-runtime touch point
+- fake-preplay shapes such as process sheet, simulated player journey, requirements bundle, or design-constraint summary wearing route prose
+- route structure honesty rather than decorative template neatness
+- whether any labeled route unit is still hiding several current moves, proofs, stop points, or next-safe threads
+- current move, local proof sign, wrong-sign stop point, and next-safe-move visibility
+- entry contract, ownership boundary, candidate-versus-live route, swap/rebind order, and first safe live-runtime touch timing when decisive
 - object or seam handoff clarity
+- whether the draft has been flattened or distorted relative to `blueprint/<module_id>.landing-rehearsal.md`
 
-## Temporary review file shape
+## Protocol
 
-Write the file in English using this order:
+Do this in order.
+
+### 1. Review exactly one draft set
+
+Review only the resolved current-module draft set.
+Do not broaden scope.
+
+### 2. Choose exactly one verdict
+
+Choose the verdict from the current draft plus `BLUEPRINT-REVIEW-RUBRIC.md`, `BLUEPRINT-GAP-ANALYSIS-V2.md`, and `BLUEPRINT-REVIEW-GATE-V2.md`.
+
+Use exactly one:
+
+- `ready_for_blueprint_gate`
+- `revise_blueprint_locally`
+- `return_to_blueprint_landing_rehearsal`
+- `return_to_architecture_review`
+- `recommend_spike`
+
+### 3. Write the temporary review file
+
+Write the file in English in this order:
 
 1. `Target`
 2. `Findings`
 3. `Gate Judgment`
 4. `Residual Risk`
 
-Each finding should:
-
-- be concrete
-- cite file and line references when possible
-- focus on bugs, route gaps, ownership gaps, fake-preplay shape, or gate-blocking ambiguity
+Each finding should be concrete, cite file and line references when possible, and focus on route gaps, route-structure failure, ownership gaps, fake-preplay shape, or gate-blocking ambiguity.
 
 If there are no findings, say so explicitly.
 
-## Verdict classes
-
-Use exactly one verdict:
-
-- `ready_for_blueprint_gate`
-- `revise_blueprint_locally`
-- `return_to_architecture_review`
-- `recommend_spike`
-
-## Final response
+### 4. Return only the review result
 
 Return only:
 
 - `review_file: <path>`
 - `findings: <count>`
 - `verdict: <verdict>`
+
+## Hard bans
+
+- do not revise the draft
+- do not broaden the review to alternate artifacts or other modules
+- do not guess missing planning truth
+- do not bury decisive findings under style commentary
+- do not return anything except the review file path, findings count, and verdict

@@ -27,6 +27,7 @@ Planning-owned:
 - `use-cases-history/<module_id>/<use_case_design_revision_id>.json`
 - `decision/<module_id>.json`
 - `decision/<module_id>.md`
+- `blueprint/<module_id>.landing-rehearsal.md`
 - `blueprint/<module_id>.draft.md`
 - `blueprint/<module_id>.draft.json`
 - `blueprint/<module_id>.md`
@@ -144,16 +145,23 @@ Deprecated runtime schemas live under:
 - mirrors the approved route, constraints, and acceptance intent for operator review
 - may not contradict `decision/<module_id>.json`; when they differ, the JSON artifact is authoritative
 
+`blueprint/<module_id>.landing-rehearsal.md`
+
+- current non-authoritative route-only landing rehearsal alias
+- written before blueprint specification alignment
+- is the source route truth for the later draft pair
+- must not be treated as approved planning truth
+
 `blueprint/<module_id>.draft.md`
 
-- current non-authoritative blueprint draft alias
-- full English planning draft used before `DG-BLUEPRINT-*`
+- current non-authoritative aligned blueprint draft alias
+- full English planning draft assembled from the stabilized landing rehearsal and used before `DG-BLUEPRINT-*`
 - must not be treated as approved planning truth
 
 `blueprint/<module_id>.draft.json`
 
-- current non-authoritative draft companion index
-- must mirror the current draft markdown enough for review and later promotion
+- current non-authoritative aligned draft companion index
+- must mirror the current draft markdown enough for review and later promotion without reshaping route truth
 - must not be treated as approved planning truth
 
 `blueprint/<module_id>.md`
@@ -195,6 +203,7 @@ Deprecated runtime schemas live under:
 - active per-scope dispatch settings are the joint pair `model_tier + reasoningEffort`
 - task `kind`, when present, is semantic task-role metadata only and is not part of dispatch selection
 - `module_acceptance.required_evidence[]` and `tasks[].acceptance_inputs[]` must explicitly declare `proof_rigor`
+- execution-facing graph tasks and their acceptance descriptions must name the planner-owned landing move strongly enough that a worker does not have to invent the decisive repair route from a boundary reminder alone
 - smoke evidence may not silently substitute for strict behavior or acceptance claims
 - when active planning truth enables repair automation, graph truth carries the active `repair_policy` so runtime and runner behavior do not guess from chat memory; any superseding same-route graph must preserve or tighten that carried policy rather than dropping or widening it
 - retired planning keys such as `reasoning_effort`, `verbosity`, and planning-level `subagent_type` may not appear in active graph truth
@@ -302,7 +311,7 @@ Deprecated runtime schemas live under:
 
 `attempts/...`
 
-- raw producer output from `run-task`, `run-craft`, `run-proof`, or `run-review`
+- raw producer output from `run-execution`, `run-craft`, `run-proof`, or `run-review`
 - includes discriminator fields such as `scope_kind` and `producer_skill`
 - includes `dispatch_audit` with requested planning settings plus resolved versus actual child model and agent values, the mirrored `producer_command`, and dispatch verification
 - active runtime truth records `dispatch_mode = opencode_native_child`; unattended execution may not use `direct_thread`
@@ -371,7 +380,8 @@ Disposable acceptance checkouts, when final proof still requires one, are local 
 - operator-visible behavior claims may not be satisfied by smoke evidence unless the approved decision explicitly narrowed the claim to smoke-level viability
 - `dag-plan` owns the initial MVP task split, dependency truth, and planning parallelism hints for a module-local graph revision
 - `repair-delta-plan` may supersede graph truth only for lawful same-route `graph_delta_only` or `blueprint_plus_graph_delta` results
-- `execution-blueprint` owns the approved implementation route, coverage against the approved use-case design, shared route decisions, and derived parallelization/convergence that downstream workflow and DAG planning must consume rather than reinvent
+- lawful `blueprint_plus_graph_delta` requires planner-owned re-rehearsal of the failing same-route neighborhood; it is not satisfied by merely appending a stricter warning or abstract route constraint to the blueprint
+- `blueprint-landing-rehearsal` owns the route-only landing rehearsal, while `blueprint-specification-alignment` owns the rehearsal-entry screen plus the aligned draft/approved blueprint package that downstream workflow and DAG planning must consume rather than reinvent
 - current-format graph revisions compiled from an execution blueprint must record `source_blueprint_revision_id`, and their tasks must record `source_realization_ids[]`
 - when that realization linkage exists, packet preparation must project a narrow but detail-rich `blueprint_excerpt` with an exact blueprint markdown anchor instead of requiring producer children to reread the full blueprint
 - producer attempts may not replace authoritative evidence
@@ -383,7 +393,7 @@ Disposable acceptance checkouts, when final proof still requires one, are local 
 - only `cleanup-worktrees` may claim post-ship worktree cleanup in runtime state
 - `session.stop_reason = all_done` is valid only after every requested module is `done`
 - `accept-module` may not reopen planning truth
-- only `execution-blueprint` may write ordinary blueprint draft aliases and promote them into approved blueprint aliases; `repair-delta-plan` may write `blueprint/<module_id>.md`, `blueprint/<module_id>.json`, and `blueprint-history/<module_id>/...` only when authoring a lawful same-route `blueprint_plus_graph_delta`
+- only `blueprint-landing-rehearsal` may author ordinary landing rehearsal aliases from scratch; `blueprint-specification-alignment` may apply bounded local repairs to the current landing rehearsal only while screening it for honest packaging, may write ordinary blueprint draft aliases, and may promote them into approved blueprint aliases; `repair-delta-plan` may write `blueprint/<module_id>.md`, `blueprint/<module_id>.json`, and `blueprint-history/<module_id>/...` only when authoring a lawful same-route `blueprint_plus_graph_delta`
 - only `prepare-user-review-brief` may write `runs/<run_id>/acceptance/<module_id>/human-review-brief.json`, and only when planning truth requires at least one human-review track for that module
 - only `record-user-review-gate` may write `runs/<run_id>/acceptance/<module_id>/human-review-record.json`, and only when planning truth requires at least one human-review track for that module
 - `godot-rup-runner` may not promote `accepted`

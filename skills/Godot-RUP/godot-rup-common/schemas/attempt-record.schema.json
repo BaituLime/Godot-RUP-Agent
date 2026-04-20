@@ -47,7 +47,7 @@
     "scope_kind": {
       "type": "string",
       "enum": [
-        "task",
+        "execution",
         "craft",
         "proof",
         "review"
@@ -56,7 +56,7 @@
     "producer_skill": {
       "type": "string",
       "enum": [
-        "run-task",
+        "run-execution",
         "run-craft",
         "run-proof",
         "run-review"
@@ -205,7 +205,7 @@
         "producer_command": {
           "type": "string",
           "enum": [
-            "godot-rup-task",
+            "godot-rup-execution",
             "godot-rup-craft",
             "godot-rup-proof",
             "godot-rup-review"

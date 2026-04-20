@@ -1,25 +1,25 @@
 ---
-description: Canonical Godot-RUP review producer instructions for one packet.
+description: Canonical Godot-RUP execution producer instructions for one packet.
 hidden: true
 subtask: true
 ---
 
-Treat `godot-rup-review` as the canonical instruction mirror for one review producer packet.
+Treat `godot-rup-execution` as the canonical instruction mirror for one execution producer packet.
 
 Use the skill tool to load only this Skill:
 
-- `run-review`
+- `run-execution`
 
 Do only this:
 
 1. resolve exactly one run-local packet path from `$ARGUMENTS` or the explicit child-dispatch request
 2. resolve the active handoff root and active run root first
 3. confirm the packet path resolves inside `<handoff_root>/runs/<run_id>/packets/...`
-4. confirm that packet is one review-scope producer packet
-5. load only `run-review`
-6. execute exactly that packet and write exactly one raw review attempt
+4. confirm that packet is one execution-scope producer packet
+5. load only `run-execution`
+6. execute exactly that packet in the assigned checkout and write exactly one raw attempt
 7. reread the written raw attempt and report concise producer status
 
-If unattended runtime mirrors these instructions inside a native child prompt, the prompt remains authoritative even when `command = godot-rup-review` is present for audit.
+If unattended runtime mirrors these instructions inside a native child prompt, the prompt remains authoritative even when `command = godot-rup-execution` is present for audit.
 
 Do not broaden scope, reschedule runtime work, guess a different dispatch route, reopen planning artifacts from the repo working tree, or open nested child dispatch here.

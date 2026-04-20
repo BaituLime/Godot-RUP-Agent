@@ -1,10 +1,10 @@
 ---
-name: run-task
+name: run-execution
 description: Execute one bounded implementation scope inside its assigned worker checkout and write only a raw attempt record. Use for ordinary execution scopes in the rebuilt runtime.
 compatibility: opencode
 ---
 
-# Run Task (Godot-RUP + C#)
+# Run Execution (Godot-RUP + C#)
 
 Use this Skill to execute one bounded implementation scope and write one raw attempt record.
 
@@ -22,8 +22,12 @@ Canonical reference:
 
 Read from:
 
+- the active handoff root and active run root first
 - one run-local packet
 - files explicitly named by that packet
+
+Treat the packet as authoritative for planning-artifact paths.
+If the packet carries planning-artifact references such as blueprint anchors or other handoff-root paths, resolve them from the active handoff root rather than guessing from the repo working tree.
 
 ## Write boundary
 
@@ -38,10 +42,11 @@ You may write only:
 - After reading the packet, move directly to execution; do not expand beyond the packet, packet-listed files, and the raw attempt write path unless the packet itself requires it.
 - Work only in the assigned worker checkout.
 - Respect `role_contract` and `recent_execution_learnings[]` from the packet as bounded execution guidance.
-- If the packet carries a blueprint markdown anchor, start with that anchored slice first. Read other blueprint sections only when the task honestly needs them.
+- If the packet carries a blueprint markdown anchor, start with that anchored slice first. Read other blueprint sections only when the execution scope honestly needs them.
+- Do not reopen planning artifacts from the repo working tree when the packet already names the authoritative handoff-root path.
 - You may do cheap local self-checks.
 - Ordinary implementation scopes should not depend on MCP/editor lifecycle. If a scope cannot be completed honestly without editor-mediated implementation feedback as a primary runtime resource, it should usually have been classified as `craft`, not widened silently here.
-- Do not treat a pre-opened editor session as a hidden prerequisite for `run-task`.
+- Do not treat a pre-opened editor session as a hidden prerequisite for `run-execution`.
 - Do not present a cheap sanity check or happy-path run as if it satisfied a packet input that requires strict proof.
 - Write the raw attempt in the active `godot_attempt_record/v1` shape.
 - Include `dispatch_audit` with the packet's requested versus actual child model and subagent values plus dispatch verification.
@@ -49,12 +54,12 @@ You may write only:
 - You may not write authoritative `pass`.
 - Record only `ready_for_attest`, `partial`, or `blocked` as self-claim.
 - Do not erase or rewrite failing logs to fake clean output.
-- Do not widen a `task` scope into `craft`, `proof`, or replanning because the child thinks that would be convenient.
+- Do not widen an `execution` scope into `craft`, `proof`, or replanning because the child thinks that would be convenient.
 - If the packet is insufficient or the work truthfully belongs to another role, hand that back in raw attempt `handoff_back` instead of silently widening this leaf scope.
 - If no prior raw attempt exists for this scope, write `attempt-001.json`; otherwise use the next zero-padded sequence for that scope.
 
 ## Consistency gate
 
 - After writing the attempt, reread it and confirm it matches `/home/bunny/.config/opencode/skills/Godot-RUP/godot-rup-common/schemas/attempt-record.schema.json`.
-- Ensure `scope_kind = task`, `producer_skill = run-task`, and `dispatch_audit.dispatch_mode = opencode_native_child`.
+- Ensure `scope_kind = execution`, `producer_skill = run-execution`, and `dispatch_audit.dispatch_mode = opencode_native_child`.
 - If the packet was insufficient or the role boundary was reached, ensure `handoff_back.reason_class` and `handoff_back.summary` are explicit instead of hiding that truth only in prose.

@@ -22,8 +22,12 @@ Canonical reference:
 
 Read from:
 
+- the active handoff root and active run root first
 - one run-local packet
 - files explicitly named by that packet
+
+Treat the packet as authoritative for planning-artifact paths.
+If the packet carries planning-artifact references such as blueprint anchors or other handoff-root paths, resolve them from the active handoff root rather than guessing from the repo working tree.
 
 ## Write boundary
 
@@ -39,6 +43,7 @@ You may write only:
 - After reading the packet, move directly to proof work; do not expand beyond the packet, packet-listed files, and the raw attempt write path unless the packet itself requires it.
 - Respect `role_contract` and `recent_execution_learnings[]` from the packet as bounded execution guidance.
 - If the packet carries a blueprint markdown anchor, start with that anchored slice first. Read other blueprint sections only when the proof scope honestly needs them.
+- Do not reopen planning artifacts from the repo working tree when the packet already names the authoritative handoff-root path.
 - Compile, headless, MCP, harness, and fixture proof work belong here, not in the scheduler.
 - When the approved proof boundary needs automated runtime interaction and no simpler built-in route is sufficient, you may create and run a bounded temporary helper such as a Python input-driver script for this proof scope.
 - Such temporary helpers must execute the approved proof itself, not fabricate packets, attempts, settlements, integrations, or stop reasons.

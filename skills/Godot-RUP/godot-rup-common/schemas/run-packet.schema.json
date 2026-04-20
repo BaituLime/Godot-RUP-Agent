@@ -65,7 +65,7 @@
     "scope_kind": {
       "type": "string",
       "enum": [
-        "task",
+        "execution",
         "craft",
         "proof",
         "review"
@@ -305,7 +305,8 @@
     },
     "goal": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "description": "Planner-owned landing move for this exact scope. It must say what route will be landed, not merely restate a prohibition or locality guard."
     },
     "must_read": {
       "type": "array",
@@ -368,7 +369,8 @@
           },
           "description": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "description": "Exact proof-facing claim for this scope. For execution-facing repair work, describe the landed route outcome, not only a negative boundary reminder."
           },
           "required_proof_type": {
             "type": "string",
@@ -455,7 +457,7 @@
     "producer_command": {
       "type": "string",
       "enum": [
-        "godot-rup-task",
+        "godot-rup-execution",
         "godot-rup-craft",
         "godot-rup-proof",
         "godot-rup-review"
@@ -482,7 +484,7 @@
         "primary_role": {
           "type": "string",
           "enum": [
-            "task",
+            "execution",
             "craft",
             "proof",
             "review"
