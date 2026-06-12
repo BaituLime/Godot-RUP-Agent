@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "potato-agent/module-session.schema.json",
+  "title": "Potato Agent Module Session State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["module_session_format", "session_id", "module_id", "chain_revision_id", "module_worktree", "module_branch", "status", "current_node_id", "node_runtime_state", "partial_reason", "park_reason", "pending_user_clarification", "active_node_overrides", "in_flight_node_ids", "settled_phase_ids", "pending_review_node_ids", "pending_integration_settlement_ids", "runtime_review_complete", "human_final_review", "technical_final_review", "ready_for_acceptance", "last_integration_commit", "last_mainline_commit", "stale_successors", "prior_failure_notes", "open_blockers", "notes"],
+  "properties": {
+    "module_session_format": { "type": "string", "const": "potato_agent_module_session/v18" },
+    "session_id": { "type": "string", "minLength": 1 },
+    "module_id": { "type": "string", "minLength": 1 },
+    "chain_revision_id": { "type": "string", "minLength": 1 },
+    "module_worktree": { "type": "string", "minLength": 1 },
+    "module_branch": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "enum": ["active", "waiting_for_review", "waiting_for_integration", "waiting_for_human_final_review", "waiting_for_technical_final_review", "parked", "ready_for_acceptance", "accepted", "blocked", "done"] },
+    "current_node_id": { "type": ["string", "null"] },
+    "node_runtime_state": { "type": "string", "enum": ["ready", "running", "partial", "parked", "waiting_for_check", "waiting_for_review", "waiting_for_integration", "waiting_for_human_final_review", "waiting_for_technical_final_review", "complete"] },
+    "partial_reason": { "type": ["string", "null"], "enum": [null, "node_incomplete", "packet_insufficient", "user_clarification_needed", "detail_override_needed"] },
+    "park_reason": { "type": ["string", "null"], "enum": [null, "replan_needed", "manual_needed", "user_clarification_needed"] },
+    "pending_user_clarification": { "anyOf": [{ "$ref": "#/$defs/clarificationRequest" }, { "type": "null" }] },
+    "active_node_overrides": { "type": "array", "items": { "$ref": "#/$defs/activeNodeOverrideRef" } },
+    "in_flight_node_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "settled_phase_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "pending_review_node_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "pending_integration_settlement_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "runtime_review_complete": { "type": "boolean" },
+    "human_final_review": { "$ref": "#/$defs/finalReviewState" },
+    "technical_final_review": { "$ref": "#/$defs/finalReviewState" },
+    "ready_for_acceptance": { "type": "boolean" },
+    "last_integration_commit": { "type": ["string", "null"] },
+    "last_mainline_commit": { "type": ["string", "null"] },
+    "stale_successors": { "type": "array", "items": { "$ref": "#/$defs/staleSuccessor" } },
+    "prior_failure_notes": { "type": "array", "maxItems": 5, "items": { "type": "string", "minLength": 1 } },
+    "open_blockers": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "notes": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+  },
+  "$defs": {
+    "finalReviewState": { "type": "object", "additionalProperties": false, "required": ["status", "record_path"], "properties": { "status": { "type": "string", "enum": ["not_started", "passed", "failed", "blocked", "stale"] }, "record_path": { "type": ["string", "null"], "minLength": 1 } } },
+    "clarificationRequest": { "type": "object", "additionalProperties": false, "required": ["question", "why_this_blocks", "conclusion_key", "answer_mode", "options", "basis_refs"], "properties": { "question": { "type": "string", "minLength": 1 }, "why_this_blocks": { "type": "string", "minLength": 1 }, "conclusion_key": { "type": "string", "minLength": 1 }, "answer_mode": { "type": "string", "enum": ["short_text", "single_choice"] }, "options": { "type": "array" }, "basis_refs": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } } } },
+    "activeNodeOverrideRef": { "type": "object", "additionalProperties": false, "required": ["override_id", "path", "source_node_id", "applies_from_node_id", "conclusion_key", "status"], "properties": { "override_id": { "type": "string", "minLength": 1 }, "path": { "type": "string", "minLength": 1 }, "source_node_id": { "type": "string", "minLength": 1 }, "applies_from_node_id": { "type": "string", "minLength": 1 }, "conclusion_key": { "type": "string", "minLength": 1 }, "status": { "type": "string", "const": "active" } } },
+    "staleSuccessor": { "type": "object", "additionalProperties": false, "required": ["repair_delta_id", "node_id", "why_stale", "pending_review_target_ids", "pending_review_scenario_ids", "pending_inspection_focus"], "properties": { "repair_delta_id": { "type": "string", "minLength": 1 }, "node_id": { "type": "string", "minLength": 1 }, "why_stale": { "type": "string", "minLength": 1 }, "pending_review_target_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "pending_review_scenario_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "pending_inspection_focus": { "type": "array", "items": { "type": "string", "minLength": 1 } } } }
+  }
+}

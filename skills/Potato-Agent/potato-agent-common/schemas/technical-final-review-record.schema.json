@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "potato-agent/technical-final-review-record.schema.json",
+  "title": "Potato Agent Technical Final Review Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["technical_final_review_record_format", "session_id", "module_id", "human_final_review_record_path", "verdict", "route_conformance", "focus_results", "findings", "repair_deltas", "human_final_review_staleness_risk", "notes"],
+  "properties": {
+    "technical_final_review_record_format": { "type": "string", "const": "potato_agent_technical_final_review_record/v2" },
+    "session_id": { "type": "string", "minLength": 1 },
+    "module_id": { "type": "string", "minLength": 1 },
+    "human_final_review_record_path": { "type": "string", "minLength": 1 },
+    "verdict": { "type": "string", "enum": ["pass", "fail", "more_checks", "hold"] },
+    "route_conformance": { "type": "string", "enum": ["aligned", "drifted", "unclear"] },
+    "focus_results": { "type": "array", "items": { "$ref": "#/$defs/focusResult" } },
+    "findings": { "type": "array", "items": { "$ref": "#/$defs/finding" } },
+    "repair_deltas": { "type": "array", "items": { "$ref": "#/$defs/repairDelta" } },
+    "human_final_review_staleness_risk": { "type": "string", "enum": ["none", "possible", "requires_user_decision"] },
+    "notes": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+  },
+  "allOf": [
+    { "if": { "properties": { "verdict": { "const": "pass" } }, "required": ["verdict"] }, "then": { "properties": { "route_conformance": { "const": "aligned" }, "focus_results": { "minItems": 1, "items": { "properties": { "result": { "const": "pass" }, "route_authority_refs": { "minItems": 1 }, "inspected_anchors": { "minItems": 1 }, "changed_files_or_surfaces": { "minItems": 1 } } } }, "repair_deltas": { "maxItems": 0 }, "human_final_review_staleness_risk": { "const": "none" }, "findings": { "not": { "contains": { "type": "object", "properties": { "severity": { "const": "blocking" } }, "required": ["severity"] } } } } } },
+    { "if": { "properties": { "verdict": { "enum": ["fail", "more_checks", "hold"] } }, "required": ["verdict"] }, "then": { "anyOf": [{ "properties": { "findings": { "minItems": 1 } } }, { "properties": { "notes": { "minItems": 1 } } }] } }
+  ],
+  "$defs": {
+    "focusResult": { "type": "object", "additionalProperties": false, "required": ["focus_id", "source", "result", "route_authority_refs", "inspected_anchors", "changed_files_or_surfaces", "risk_checked", "why_passes"], "properties": { "focus_id": { "type": "string", "minLength": 1 }, "source": { "type": "string", "minLength": 1 }, "result": { "type": "string", "enum": ["pass", "fail", "unclear"] }, "route_authority_refs": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "inspected_anchors": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "changed_files_or_surfaces": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "risk_checked": { "type": "string", "minLength": 1 }, "why_passes": { "type": "string", "minLength": 1 } } },
+    "finding": { "type": "object", "additionalProperties": false, "required": ["finding_id", "severity", "category", "anchor", "issue", "impact", "repair_target"], "properties": { "finding_id": { "type": "string", "minLength": 1 }, "severity": { "type": "string", "enum": ["blocking", "warning"] }, "category": { "type": "string", "enum": ["architecture_fit", "fake_success", "cheap_route_substitute", "debug_test_cleanup", "lifecycle_state", "maintainability_performance", "scope_creep"] }, "anchor": { "type": ["string", "null"], "minLength": 1 }, "issue": { "type": "string", "minLength": 1 }, "impact": { "type": "string", "minLength": 1 }, "repair_target": { "type": ["string", "null"], "minLength": 1 } } },
+    "repairDelta": { "type": "object", "additionalProperties": false, "required": ["repair_delta_id", "source", "target", "failure_signature", "rejected_substitutes", "required_craft_self_check_gates", "affected_successors"], "properties": { "repair_delta_id": { "type": "string", "minLength": 1 }, "source": { "$ref": "#/$defs/repairDeltaSource" }, "target": { "$ref": "#/$defs/repairDeltaTarget" }, "failure_signature": { "type": "string", "minLength": 1 }, "rejected_substitutes": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "required_craft_self_check_gates": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "affected_successors": { "type": "array", "items": { "$ref": "#/$defs/affectedSuccessor" } } } },
+    "repairDeltaSource": { "type": "object", "additionalProperties": false, "required": ["kind", "node_id", "attempt_ids", "review_target_ids", "review_scenario_ids", "source_use_case_claim_ids", "inspection_finding_ids", "human_final_review_record_path", "technical_final_review_record_path"], "properties": { "kind": { "type": "string", "const": "technical_final_review" }, "node_id": { "type": ["string", "null"], "minLength": 1 }, "attempt_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "review_target_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "review_scenario_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "source_use_case_claim_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "inspection_finding_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "human_final_review_record_path": { "type": "string", "minLength": 1 }, "technical_final_review_record_path": { "type": "string", "minLength": 1 } } },
+    "repairDeltaTarget": { "type": "object", "additionalProperties": false, "required": ["node_id", "repair_mode"], "properties": { "node_id": { "type": ["string", "null"], "minLength": 1 }, "repair_mode": { "type": "string", "enum": ["craft_repair", "custom_craft_repair", "ask_user", "visible_replanning"] } } },
+    "affectedSuccessor": { "type": "object", "additionalProperties": false, "required": ["node_id", "why_stale", "review_target_ids_to_rerun", "review_scenario_ids_to_recheck", "inspection_focus_to_rerun"], "properties": { "node_id": { "type": "string", "minLength": 1 }, "why_stale": { "type": "string", "minLength": 1 }, "review_target_ids_to_rerun": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "review_scenario_ids_to_recheck": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "inspection_focus_to_rerun": { "type": "array", "items": { "type": "string", "minLength": 1 } } } }
+  }
+}

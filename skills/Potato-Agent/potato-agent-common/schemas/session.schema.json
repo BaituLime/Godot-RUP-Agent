@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "potato-agent/session.schema.json",
+  "title": "Potato Agent Runtime Session",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["session_format", "session_id", "lineage_session_id", "previous_session_id", "handoff_root", "module_id", "invocation", "current_phase", "stop_reason", "stop_scope", "environment_blocker", "notes"],
+  "properties": {
+    "session_format": { "type": "string", "const": "potato_agent_session/v3" },
+    "session_id": { "type": "string", "minLength": 1 },
+    "lineage_session_id": { "type": "string", "minLength": 1 },
+    "previous_session_id": { "type": ["string", "null"] },
+    "handoff_root": { "type": "string", "minLength": 1 },
+    "module_id": { "type": "string", "minLength": 1 },
+    "invocation": { "type": "object", "additionalProperties": false, "required": ["entry_surface", "mode", "parent_model", "started_at"], "properties": { "entry_surface": { "type": "string", "enum": ["potato-agent-runner", "potato-agent-step", "potato-agent-acceptor"] }, "mode": { "type": "string", "enum": ["runtime", "acceptance"] }, "parent_model": { "type": "string", "minLength": 1 }, "started_at": { "type": "string", "minLength": 1 } } },
+    "current_phase": { "type": "string", "enum": ["allocating_worktrees", "orchestrating", "acceptance", "stopped"] },
+    "continue_reason": { "type": ["string", "null"], "enum": [null, "continue_normal", "continue_level1_repair", "continue_level2_chain_continuation", "continue_hfr_paired_repair", "continue_tfr_repair"] },
+    "resume_reason": { "type": ["string", "null"], "enum": [null, "resume_after_manual", "resume_after_legal_stop"] },
+    "stop_reason": { "type": ["string", "null"], "enum": [null, "parked_modules_pending", "waiting_for_human_final_review", "ready_for_acceptance", "global_blocked", "all_done"] },
+    "stop_scope": { "type": ["string", "null"] },
+    "environment_blocker": { "type": ["string", "null"] },
+    "notes": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+  }
+}

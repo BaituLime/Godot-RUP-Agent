@@ -1,15 +1,78 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": [
-    [
-      "./plugins/godot-rup-continuation/index.js",
-      {
-        "stateRoot": "./state/godot-rup-continuation",
-        "recoveryWindowMs": 5000,
-        "reinjectionCooldownMs": 5000,
-        "maxSameStateInjections": 3
+  "permission": {
+    "external_directory": {
+      "~/.config/opencode/**": "allow",
+      "~/.local/share/opencode/**": "allow",
+      "~/.nuget/packages/**": "allow",
+      "/mnt/Projects/KaikenDemo/**": "allow",
+      "/mnt/Materials/KaikenDemo/**": "allow",
+      "/mnt/Projects/Project-Kaiken/.worktrees/**": "allow",
+      "/tmp/**": "allow",
+      "/root/*": "deny",
+      "/proc/*": "deny",
+      "/sys/*": "deny"
+    }
+  },
+  "compaction": {
+    "auto": false,
+    "prune": true,
+    "reserved": 1
+  },
+  "shell": "/usr/bin/bash",
+  "provider": {
+    "openai": {
+      "options": {
+        "headerTimeout": 60000,
+        "timeout": 600000,
+        "chunkTimeout": 60000
       }
-    ]
-  ]
+    },
+    "ohmygpt-claude": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "OhMyGPT Claude",
+      "options": {
+        "apiKey": "sk-Qw788ZLQ3056781a07fDT3BLbkFJDcdedaa1b9234C149B85",
+        "baseURL": "https://api.ohmygpt.com/api/v1/ai/openai/cc-omg/v1"
+      },
+      "models": {
+        "claude-opus-4-8": {
+          "options": {
+            "thinking": {
+              "type": "enabled",
+              "budgetTokens": 128000
+            }
+          },
+          "name": "Claude Opus 4.8",
+          "limit": {
+            "context": 1000000,
+            "output": 128000
+          }
+        }
+      }
+    },
+    "ohmygpt-openai": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "OhMyGPT OpenAI",
+      "options": {
+        "apiKey": "sk-Qw788ZLQ3056781a07fDT3BLbkFJDcdedaa1b9234C149B85",
+        "baseURL": "https://api.ohmygpt.com/v1"
+      },
+      "models": {
+        "gpt-5.5-pro": {
+          "options": {
+            "reasoningEffort": "high",
+            "textVerbosity": "low",
+            "reasoningSummary": "auto",
+            "include": ["reasoning.encrypted_content"]
+          },
+          "name": "GPT-5.5 Pro",
+          "limit": {
+            "context": 1050000,
+            "output": 128000
+          }
+        }
+      }
+    }
   }
 }

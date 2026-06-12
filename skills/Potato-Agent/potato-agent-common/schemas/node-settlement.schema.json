@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "potato-agent/node-settlement.schema.json",
+  "title": "Potato Agent Phase Settlement",
+  "description": "Phase settlement record kept at the historical schema path. The record is anchored by one review Node and covers that review Node plus its reviewed craft group.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "settlement_format",
+    "session_id",
+    "module_id",
+    "chain_revision_id",
+    "settlement_id",
+    "review_node_id",
+    "settled_node_ids",
+    "reviewed_craft_node_ids",
+    "review_target_ids",
+    "review_scenario_ids",
+    "source_use_case_claim_ids",
+    "source_architecture_detail_ids",
+    "source_cross_cutting_contract_ids",
+    "craft_readiness_refs",
+    "functional_stage",
+    "inspector_stage",
+    "repair_deltas",
+    "stale_successors",
+    "covered_evidence_scope_ids",
+    "gate_result",
+    "first_blocker",
+    "notes"
+  ],
+  "properties": {
+    "settlement_format": { "type": "string", "const": "potato_agent_phase_settlement/v13" },
+    "session_id": { "type": "string", "minLength": 1 },
+    "module_id": { "type": "string", "minLength": 1 },
+    "chain_revision_id": { "type": "string", "minLength": 1 },
+    "settlement_id": { "type": "string", "minLength": 1 },
+    "review_node_id": { "type": "string", "minLength": 1 },
+    "settled_node_ids": { "type": "array", "minItems": 2, "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "reviewed_craft_node_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "review_target_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "review_scenario_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "source_use_case_claim_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "source_architecture_detail_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "source_cross_cutting_contract_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "craft_readiness_refs": { "type": "array", "items": { "$ref": "#/$defs/craftReadinessRef" } },
+    "functional_stage": { "$ref": "#/$defs/functionalStage" },
+    "inspector_stage": { "$ref": "#/$defs/inspectorStage" },
+    "repair_deltas": { "type": "array", "items": { "$ref": "#/$defs/repairDelta" } },
+    "stale_successors": { "type": "array", "items": { "$ref": "#/$defs/staleSuccessor" } },
+    "covered_evidence_scope_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "gate_result": { "$ref": "#/$defs/gateResult" },
+    "first_blocker": { "type": ["string", "null"], "minLength": 1 },
+    "notes": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "gate_result": { "properties": { "phase_status": { "const": "pass" } }, "required": ["phase_status"] } }, "required": ["gate_result"] },
+      "then": {
+        "properties": {
+          "functional_stage": { "properties": { "status": { "const": "pass" } }, "required": ["status"] },
+          "inspector_stage": { "properties": { "status": { "const": "pass" }, "coverage_refs": { "minItems": 1, "not": { "contains": { "properties": { "status": { "const": "failed" } }, "required": ["status"] } } } }, "required": ["status", "coverage_refs"] },
+          "repair_deltas": { "maxItems": 0 },
+          "first_blocker": { "const": null },
+          "gate_result": { "properties": { "next_action": { "const": "integrate_phase" }, "integration_ready": { "const": true }, "runtime_review_complete": { "const": false } }, "required": ["next_action", "integration_ready", "runtime_review_complete"] }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "gate_result": { "properties": { "phase_status": { "const": "rework_needed" } }, "required": ["phase_status"] } }, "required": ["gate_result"] },
+      "then": { "properties": { "gate_result": { "properties": { "next_action": { "const": "rework_needed" }, "integration_ready": { "const": false }, "runtime_review_complete": { "const": false } }, "required": ["next_action", "integration_ready", "runtime_review_complete"] } } }
+    },
+    {
+      "if": { "properties": { "gate_result": { "properties": { "phase_status": { "const": "blocked" } }, "required": ["phase_status"] } }, "required": ["gate_result"] },
+      "then": { "properties": { "gate_result": { "properties": { "integration_ready": { "const": false }, "runtime_review_complete": { "const": false } }, "required": ["integration_ready", "runtime_review_complete"] }, "first_blocker": { "type": "string", "minLength": 1 } } }
+    },
+    {
+      "if": { "properties": { "functional_stage": { "properties": { "status": { "enum": ["rework_needed", "blocked"] } }, "required": ["status"] } }, "required": ["functional_stage"] },
+      "then": { "properties": { "inspector_stage": { "properties": { "status": { "const": "not_run" }, "not_run_reason": { "enum": ["functional_failed", "functional_blocked"] } }, "required": ["status", "not_run_reason"] } } }
+    },
+    {
+      "if": { "properties": { "functional_stage": { "properties": { "status": { "const": "pass" } }, "required": ["status"] } }, "required": ["functional_stage"] },
+      "then": { "properties": { "inspector_stage": { "properties": { "status": { "enum": ["pass", "rework_needed", "blocked"] } }, "required": ["status"] } } }
+    }
+  ],
+  "$defs": {
+    "craftReadinessRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["craft_node_id", "source_attempt_id", "gate_ids", "status", "supporting_only"],
+      "properties": {
+        "craft_node_id": { "type": "string", "minLength": 1 },
+        "source_attempt_id": { "type": "string", "minLength": 1 },
+        "gate_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "status": { "type": "string", "enum": ["ready", "not_ready", "blocked"] },
+        "supporting_only": { "type": "boolean", "const": true }
+      }
+    },
+    "functionalStage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "result_refs", "coverage_refs", "review_target_ids", "review_scenario_ids", "source_use_case_claim_ids", "first_blocker"],
+      "properties": {
+        "status": { "type": "string", "enum": ["pass", "rework_needed", "blocked"] },
+        "result_refs": { "type": "array", "items": { "$ref": "#/$defs/resultRef" } },
+        "coverage_refs": { "type": "array", "items": { "$ref": "#/$defs/coverageRef" } },
+        "review_target_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "review_scenario_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "source_use_case_claim_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "first_blocker": { "type": ["string", "null"], "minLength": 1 }
+      }
+    },
+    "inspectorStage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "not_run_reason", "result_refs", "coverage_refs", "inspection_finding_ids", "first_blocker"],
+      "properties": {
+        "status": { "type": "string", "enum": ["pass", "rework_needed", "blocked", "not_run"] },
+        "not_run_reason": { "type": ["string", "null"], "enum": [null, "functional_failed", "functional_blocked"] },
+        "result_refs": { "type": "array", "items": { "$ref": "#/$defs/resultRef" } },
+        "coverage_refs": { "type": "array", "items": { "$ref": "#/$defs/coverageRef" } },
+        "inspection_finding_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "first_blocker": { "type": ["string", "null"], "minLength": 1 }
+      }
+    },
+    "resultRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stage", "attempt_id", "result_id", "status"],
+      "properties": {
+        "stage": { "type": "string", "enum": ["review_functional", "review_inspector"] },
+        "attempt_id": { "type": "string", "minLength": 1 },
+        "result_id": { "type": "string", "minLength": 1 },
+        "status": { "type": "string", "enum": ["pass", "rework_needed", "blocked"] }
+      }
+    },
+    "coverageRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["coverage_id", "review_target_ids", "review_scenario_ids", "source_scope_ids", "status"],
+      "properties": {
+        "coverage_id": { "type": "string", "minLength": 1 },
+        "review_target_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "review_scenario_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "source_scope_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "status": { "type": "string", "enum": ["covered", "lawfully_blocked", "failed"] }
+      }
+    },
+    "repairDelta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repair_delta_id", "source_stage", "target_craft_node_id", "review_target_ids", "review_scenario_ids", "source_use_case_claim_ids", "inspection_finding_ids", "failure_signature", "affected_successors"],
+      "properties": {
+        "repair_delta_id": { "type": "string", "minLength": 1 },
+        "source_stage": { "type": "string", "enum": ["review_functional", "review_inspector", "settlement_audit"] },
+        "target_craft_node_id": { "type": ["string", "null"], "minLength": 1 },
+        "review_target_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "review_scenario_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "source_use_case_claim_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "inspection_finding_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "failure_signature": { "type": "string", "minLength": 1 },
+        "affected_successors": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }
+      }
+    },
+    "staleSuccessor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repair_delta_id", "node_id", "why_stale", "pending_review_target_ids", "pending_review_scenario_ids", "pending_inspection_focus"],
+      "properties": {
+        "repair_delta_id": { "type": "string", "minLength": 1 },
+        "node_id": { "type": "string", "minLength": 1 },
+        "why_stale": { "type": "string", "minLength": 1 },
+        "pending_review_target_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "pending_review_scenario_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "pending_inspection_focus": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }
+      }
+    },
+    "gateResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["phase_status", "next_action", "integration_ready", "runtime_review_complete"],
+      "properties": {
+        "phase_status": { "type": "string", "enum": ["pass", "rework_needed", "blocked"] },
+        "next_action": { "type": "string", "enum": ["integrate_phase", "rework_needed", "manual_needed", "blocked", "runtime_review_complete"] },
+        "integration_ready": { "type": "boolean" },
+        "runtime_review_complete": { "type": "boolean" }
+      }
+    }
+  }
+}

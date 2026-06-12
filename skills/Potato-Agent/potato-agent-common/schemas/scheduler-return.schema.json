@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "potato-agent/scheduler-return.schema.json",
+  "title": "Potato Agent Scheduler Return Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["scheduler_return_format", "session_id", "recorded_phase", "recorded_stop_reason", "protocol_ok", "return_allowed", "next_action", "written_at"],
+  "properties": {
+    "scheduler_return_format": { "type": "string", "const": "potato_agent_scheduler_return/v5" },
+    "session_id": { "type": "string", "minLength": 1 },
+    "recorded_phase": { "type": "string", "enum": ["allocating_worktrees", "orchestrating", "acceptance", "stopped"] },
+    "recorded_stop_reason": { "type": ["string", "null"], "enum": [null, "parked_modules_pending", "waiting_for_human_final_review", "ready_for_acceptance", "global_blocked", "all_done"] },
+    "protocol_ok": { "type": "boolean" },
+    "return_allowed": { "type": "boolean" },
+    "next_action": { "type": "string", "enum": ["surface_stop_to_user", "fail_closed_protocol_blocker"] },
+    "written_at": { "type": "string", "minLength": 1 }
+  },
+  "allOf": [
+    { "if": { "properties": { "protocol_ok": { "const": true } }, "required": ["protocol_ok"] }, "then": { "properties": { "return_allowed": { "const": true } } } },
+    { "if": { "properties": { "protocol_ok": { "const": true }, "return_allowed": { "const": true } }, "required": ["protocol_ok", "return_allowed"] }, "then": { "properties": { "recorded_phase": { "const": "stopped" }, "recorded_stop_reason": { "type": "string" }, "next_action": { "const": "surface_stop_to_user" } } } },
+    { "if": { "properties": { "protocol_ok": { "const": false } }, "required": ["protocol_ok"] }, "then": { "properties": { "return_allowed": { "const": false }, "next_action": { "const": "fail_closed_protocol_blocker" } } } }
+  ]
+}

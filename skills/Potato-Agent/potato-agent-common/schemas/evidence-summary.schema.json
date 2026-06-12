@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "potato-agent/evidence-summary.schema.json",
+  "title": "Potato Agent Evidence Summary",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["summary_format", "module_id", "scope_id", "kind", "status", "outcome", "checks_run", "mcp_used", "headless_used", "proofs", "artifacts", "notes", "first_blocker"],
+  "properties": {
+    "summary_format": { "type": "string", "const": "potato_agent_evidence_summary/v7" },
+    "module_id": { "type": "string", "minLength": 1 },
+    "scope_id": { "type": "string", "minLength": 1 },
+    "kind": { "type": "string", "enum": ["review_functional", "human_final_review", "technical_final_review", "settlement_review", "acceptance"] },
+    "status": { "type": "string", "enum": ["pass", "fail", "blocked"] },
+    "outcome": { "type": "string", "enum": ["done", "rework_needed", "manual_needed", "replan_needed"] },
+    "completion_quality": { "type": "string", "enum": ["exact", "partial", "failed"] },
+    "checks_run": { "type": "array", "items": { "$ref": "#/$defs/checkRun" } },
+    "mcp_used": { "type": "boolean" },
+    "headless_used": { "type": "boolean" },
+    "proofs": { "type": "array", "items": { "$ref": "#/$defs/proof" } },
+    "scenario_coverage": { "type": "array", "items": { "$ref": "#/$defs/scenarioCoverage" } },
+    "covered_scope_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "source_judgment_results": { "type": "array", "items": { "$ref": "#/$defs/sourceJudgmentResult" } },
+    "acceptance_readback": { "$ref": "#/$defs/acceptanceReadback" },
+    "forbidden_simplification_breaches": { "type": "array", "items": { "$ref": "#/$defs/forbiddenSimplificationBreach" } },
+    "findings": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "artifacts": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "notes": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "first_blocker": { "type": ["string", "null"] }
+  },
+  "allOf": [
+    { "if": { "properties": { "kind": { "const": "acceptance" } }, "required": ["kind"] }, "then": { "required": ["completion_quality", "covered_scope_ids", "scenario_coverage", "source_judgment_results", "acceptance_readback", "forbidden_simplification_breaches", "findings"], "properties": { "scope_id": { "const": "module-acceptance" }, "proofs": { "minItems": 1 }, "source_judgment_results": { "minItems": 1 } } } },
+    { "if": { "properties": { "kind": { "const": "acceptance" }, "status": { "const": "pass" } }, "required": ["kind", "status"] }, "then": { "properties": { "outcome": { "const": "done" }, "completion_quality": { "const": "exact" }, "forbidden_simplification_breaches": { "maxItems": 0 }, "scenario_coverage": { "items": { "properties": { "coverage": { "const": "exact" } } } }, "source_judgment_results": { "items": { "properties": { "result": { "const": "pass" }, "authority_sources": { "minItems": 1 }, "scenario_ids": { "minItems": 1 } } } } } } }
+  ],
+  "$defs": {
+    "checkRun": { "type": "object", "additionalProperties": false, "required": ["name", "status"], "properties": { "name": { "type": "string", "minLength": 1 }, "status": { "type": "string", "enum": ["passed", "failed"] }, "command": { "type": "string" }, "summary": { "type": "string" } } },
+    "proof": { "type": "object", "additionalProperties": false, "required": ["proof_id", "proof_type", "subject", "proof_rigor", "verdict", "source_attempt_ids", "review_functional_report_refs"], "properties": { "proof_id": { "type": "string", "minLength": 1 }, "proof_type": { "type": "string", "enum": ["compile", "headless", "snapshot_round_trip", "scene_structure_proof", "behavior_proof", "code_inspection", "data_migration_proof", "dispatch_audit", "resource_bootstrap_proof", "other"] }, "subject": { "type": "string", "minLength": 1 }, "proof_rigor": { "type": "string", "enum": ["smoke", "strict"] }, "verdict": { "type": "string", "enum": ["pass", "fail"] }, "source_attempt_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "review_functional_report_refs": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "notes": { "type": "string" } } },
+    "scenarioCoverage": { "type": "object", "additionalProperties": false, "required": ["review_scenario_id", "coverage"], "properties": { "review_scenario_id": { "type": "string", "minLength": 1 }, "coverage": { "type": "string", "enum": ["exact", "partial", "missing", "stale"] }, "notes": { "type": "string" } } },
+    "sourceJudgmentResult": { "type": "object", "additionalProperties": false, "required": ["source_type", "source_id", "description", "pass_criterion", "result", "authority_sources", "scenario_ids", "evidence_scope_ids", "cited_evidence_paths", "cited_human_final_review_refs", "cited_technical_final_review_refs"], "properties": { "source_type": { "type": "string", "const": "use_case_claim" }, "source_id": { "type": "string", "minLength": 1 }, "description": { "type": "string", "minLength": 1 }, "pass_criterion": { "type": "string", "minLength": 1 }, "result": { "type": "string", "enum": ["pass", "fail", "missing"] }, "authority_sources": { "type": "array", "items": { "type": "string", "enum": ["review_evidence", "human_final_review", "technical_final_review", "settlement_review", "final_acceptance"] } }, "scenario_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "evidence_scope_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "cited_evidence_paths": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "cited_human_final_review_refs": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "cited_technical_final_review_refs": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "blocking_reason": { "type": ["string", "null"] } }, "allOf": [{ "if": { "properties": { "result": { "const": "pass" } }, "required": ["result"] }, "then": { "properties": { "authority_sources": { "minItems": 1 }, "scenario_ids": { "minItems": 1 } }, "anyOf": [{ "properties": { "cited_evidence_paths": { "minItems": 1 } } }, { "properties": { "cited_human_final_review_refs": { "minItems": 1 } } }, { "properties": { "cited_technical_final_review_refs": { "minItems": 1 } } }] } }] },
+    "acceptanceReadback": { "type": "object", "additionalProperties": false, "required": ["decision_path", "review_scenario_path", "chain_path", "dossier_path", "human_final_review_record_path", "human_final_review_verdict", "technical_final_review_record_path", "technical_final_review_verdict"], "properties": { "decision_path": { "type": "string", "minLength": 1 }, "review_scenario_path": { "type": "string", "minLength": 1 }, "chain_path": { "type": "string", "minLength": 1 }, "dossier_path": { "type": "string", "minLength": 1 }, "human_final_review_record_path": { "type": "string", "minLength": 1 }, "human_final_review_verdict": { "type": "string", "enum": ["pass"] }, "technical_final_review_record_path": { "type": "string", "minLength": 1 }, "technical_final_review_verdict": { "type": "string", "enum": ["pass"] } } },
+    "forbiddenSimplificationBreach": { "type": "object", "additionalProperties": false, "required": ["breach_type", "summary"], "properties": { "breach_type": { "type": "string", "enum": ["behavior_as_structure", "acceptance_gap_relabelled_as_risk", "unapproved_route_downgrade", "hidden_dispatch_fallback", "other"] }, "summary": { "type": "string", "minLength": 1 }, "related_scope_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } } } }
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "potato-agent/acceptance-dossier.schema.json",
+  "title": "Potato Agent Acceptance Dossier",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "acceptance_dossier_format",
+    "session_id",
+    "module_id",
+    "decision_path",
+    "review_scenario_path",
+    "chain_path",
+    "module_session_path",
+    "module_branch",
+    "module_worktree",
+    "last_integration_commit",
+    "evidence_scope_ids",
+    "evidence_paths",
+    "settlement_paths",
+    "integration_paths",
+    "human_final_review_record_path",
+    "human_final_review_verdict",
+    "technical_final_review_record_path",
+    "technical_final_review_verdict",
+    "planned_source_ids",
+    "scenario_coverage",
+    "source_judgment_inputs",
+    "pending_risks",
+    "notes"
+  ],
+  "properties": {
+    "acceptance_dossier_format": { "type": "string", "const": "potato_agent_acceptance_dossier/v7" },
+    "session_id": { "type": "string", "minLength": 1 },
+    "module_id": { "type": "string", "minLength": 1 },
+    "decision_path": { "type": "string", "minLength": 1 },
+    "review_scenario_path": { "type": "string", "minLength": 1 },
+    "chain_path": { "type": "string", "minLength": 1 },
+    "module_session_path": { "type": "string", "minLength": 1 },
+    "module_branch": { "type": "string", "minLength": 1 },
+    "module_worktree": { "type": "string", "minLength": 1 },
+    "last_integration_commit": { "type": ["string", "null"] },
+    "evidence_scope_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "evidence_paths": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "settlement_paths": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "integration_paths": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "human_final_review_record_path": { "type": "string", "minLength": 1 },
+    "human_final_review_verdict": { "type": "string", "const": "pass" },
+    "technical_final_review_record_path": { "type": "string", "minLength": 1 },
+    "technical_final_review_verdict": { "type": "string", "const": "pass" },
+    "planned_source_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+    "scenario_coverage": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/scenarioCoverage" } },
+    "source_judgment_inputs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/sourceJudgmentInput" } },
+    "pending_risks": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "notes": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+  },
+  "$defs": {
+    "scenarioCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["review_scenario_id", "source_use_case_claim_ids", "status", "review_target_ids", "settlement_paths", "stale_after_final_reviews", "notes"],
+      "properties": {
+        "review_scenario_id": { "type": "string", "minLength": 1 },
+        "source_use_case_claim_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "status": { "type": "string", "enum": ["closed", "open", "blocked", "stale"] },
+        "review_target_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "settlement_paths": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "evidence_refs": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "stale_after_final_reviews": { "type": "boolean" },
+        "notes": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      },
+      "allOf": [
+        { "if": { "properties": { "status": { "const": "closed" } }, "required": ["status"] }, "then": { "required": ["evidence_refs"], "properties": { "review_target_ids": { "minItems": 1 }, "settlement_paths": { "minItems": 1 }, "evidence_refs": { "minItems": 1 }, "stale_after_final_reviews": { "const": false } } } }
+      ]
+    },
+    "sourceJudgmentInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_type", "source_id", "description", "pass_criterion", "collection_status", "authority_sources", "scenario_ids", "cited_scope_ids", "cited_evidence_paths", "cited_human_final_review_refs", "cited_technical_final_review_refs", "downgraded_or_rejected_reasons"],
+      "properties": {
+        "source_type": { "type": "string", "const": "use_case_claim" },
+        "source_id": { "type": "string", "minLength": 1 },
+        "description": { "type": "string", "minLength": 1 },
+        "pass_criterion": { "type": "string", "minLength": 1 },
+        "collection_status": { "type": "string", "enum": ["present", "missing"] },
+        "authority_sources": { "type": "array", "items": { "type": "string", "enum": ["review_evidence", "human_final_review", "technical_final_review", "settlement_review"] } },
+        "scenario_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "cited_scope_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "cited_evidence_paths": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "cited_human_final_review_refs": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "cited_technical_final_review_refs": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "downgraded_or_rejected_reasons": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      },
+      "allOf": [
+        { "if": { "properties": { "collection_status": { "const": "present" } }, "required": ["collection_status"] }, "then": { "properties": { "authority_sources": { "minItems": 1 }, "scenario_ids": { "minItems": 1 } }, "anyOf": [{ "properties": { "cited_evidence_paths": { "minItems": 1 } } }, { "properties": { "cited_human_final_review_refs": { "minItems": 1 } } }, { "properties": { "cited_technical_final_review_refs": { "minItems": 1 } } }] } },
+        { "if": { "properties": { "collection_status": { "const": "missing" } }, "required": ["collection_status"] }, "then": { "properties": { "authority_sources": { "maxItems": 0 }, "scenario_ids": { "maxItems": 0 }, "cited_scope_ids": { "maxItems": 0 }, "cited_evidence_paths": { "maxItems": 0 }, "cited_human_final_review_refs": { "maxItems": 0 }, "cited_technical_final_review_refs": { "maxItems": 0 } } } }
+      ]
+    }
+  }
+}

@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "potato-agent/chain-handoff.schema.json",
+  "title": "Potato Agent Chain Handoff",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "chain_format",
+    "module_id",
+    "chain_revision_id",
+    "supersedes_chain_revision_id",
+    "branch",
+    "chain_contract",
+    "module_acceptance",
+    "nodes"
+  ],
+  "properties": {
+    "chain_format": { "type": "string", "const": "potato_agent_chain_handoff/v18" },
+    "module_id": { "type": "string", "minLength": 1 },
+    "chain_revision_id": { "type": "string", "minLength": 1 },
+    "supersedes_chain_revision_id": { "type": ["string", "null"] },
+    "branch": { "type": "string", "minLength": 1 },
+    "chain_contract": { "$ref": "#/$defs/chainContract" },
+    "parallelism_hints": { "$ref": "#/$defs/parallelismHints" },
+    "module_acceptance": { "$ref": "#/$defs/moduleAcceptance" },
+    "nodes": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/node" } }
+  },
+  "$defs": {
+    "nodeKind": { "type": "string", "enum": ["craft", "review"] },
+    "surfaceType": { "type": "string", "enum": ["source_inspection", "code_inspection", "deterministic_model", "production_integration_probe", "normal_player_game_path"] },
+    "chainContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["current_head_node_id", "node_repair_policy", "local_insertion_policy"],
+      "properties": {
+        "current_head_node_id": { "type": "string", "minLength": 1 },
+        "node_repair_policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["allow_packet_repair", "allow_detail_override", "allow_review_backtracking_repair", "allow_hfr_craft_only_repair"],
+          "properties": {
+            "allow_packet_repair": { "type": "boolean", "const": true },
+            "allow_detail_override": { "type": "boolean", "const": true },
+            "allow_review_backtracking_repair": { "type": "boolean", "const": true },
+            "allow_hfr_craft_only_repair": { "type": "boolean", "const": true }
+          }
+        },
+        "local_insertion_policy": { "type": "string", "minLength": 1 }
+      }
+    },
+    "parallelismHints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cross_module_only", "recommended_concurrency_ceiling", "notes"],
+      "properties": {
+        "cross_module_only": { "type": "boolean", "const": true },
+        "recommended_concurrency_ceiling": { "type": "integer", "minimum": 1 },
+        "notes": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "moduleAcceptance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "final_verdict_is_chain_node", "supporting_node_ids"],
+      "properties": {
+        "strategy": { "type": "string", "minLength": 1 },
+        "final_verdict_is_chain_node": { "type": "boolean", "const": false },
+        "supporting_node_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "predecessor_node_ids", "successor_node_ids", "node_route_capsule", "source_use_case_claim_ids", "source_review_scenario_ids", "source_route_implementation_detail_ids", "source_cross_cutting_contract_ids", "must_read", "likely_read", "gate", "craft_plan", "review_plan", "resources_required", "mcp"],
+      "properties": {
+        "id": { "type": "string", "pattern": ".*[a-zA-Z].*" },
+        "kind": { "$ref": "#/$defs/nodeKind" },
+        "predecessor_node_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "successor_node_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "node_route_capsule": { "$ref": "#/$defs/nodeRouteCapsule" },
+        "source_use_case_claim_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "source_review_scenario_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "source_route_implementation_detail_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "source_cross_cutting_contract_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "must_read": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "likely_read": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "gate": { "$ref": "#/$defs/nodeGate" },
+        "craft_plan": { "anyOf": [{ "$ref": "#/$defs/craftPlan" }, { "type": "null" }] },
+        "review_plan": { "anyOf": [{ "$ref": "#/$defs/reviewPlan" }, { "type": "null" }] },
+        "resources_required": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "mcp": { "$ref": "#/$defs/mcpPosture" }
+      },
+      "allOf": [
+        { "if": { "properties": { "kind": { "const": "craft" } }, "required": ["kind"] }, "then": { "properties": { "craft_plan": { "$ref": "#/$defs/craftPlan" }, "review_plan": { "const": null } } } },
+        { "if": { "properties": { "kind": { "const": "review" } }, "required": ["kind"] }, "then": { "properties": { "craft_plan": { "const": null }, "review_plan": { "$ref": "#/$defs/reviewPlan" }, "source_review_scenario_ids": { "minItems": 1 } } } }
+      ]
+    },
+    "craftPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["context_id", "execution_scope", "served_review_scenario_ids", "self_check_gates", "test_layers", "debug_test_cleanup_policy", "loop_policy", "failure_routing"],
+      "properties": {
+        "context_id": { "type": "string", "minLength": 1 },
+        "execution_scope": { "type": "string", "minLength": 1 },
+        "served_review_scenario_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "self_check_gates": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/checkGate" } },
+        "test_layers": { "type": "array", "items": { "type": "string", "enum": ["unit", "integration", "regression", "runtime_scenario", "visual", "build_import", "debug_test_cleanup"] } },
+        "debug_test_cleanup_policy": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "loop_policy": { "type": "string", "minLength": 1 },
+        "failure_routing": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "reviewPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["context_id", "reviewed_craft_node_ids", "review_targets", "inspector_step", "affected_rerun_scope", "failure_routing"],
+      "properties": {
+        "context_id": { "type": "string", "minLength": 1 },
+        "reviewed_craft_node_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "review_targets": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/reviewTarget" } },
+        "inspector_step": { "$ref": "#/$defs/reviewInspectorStep" },
+        "affected_rerun_scope": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "failure_routing": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "reviewTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["review_target_id", "source_use_case_claim_ids", "source_review_scenario_ids", "source_route_implementation_detail_ids", "source_cross_cutting_contract_ids", "reviewed_craft_node_ids", "required_review_path", "repair_target_node_ids", "stale_successor_node_ids"],
+      "properties": {
+        "review_target_id": { "type": "string", "minLength": 1 },
+        "source_use_case_claim_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "source_review_scenario_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "source_route_implementation_detail_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "source_cross_cutting_contract_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "reviewed_craft_node_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "required_review_path": { "$ref": "#/$defs/surfaceType" },
+        "repair_target_node_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "stale_successor_node_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "reviewInspectorStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["route_conformance_scope", "scenario_path_hypotheses", "changed_surface_scope", "test_asset_cleanup_scope"],
+      "properties": {
+        "route_conformance_scope": { "type": "string", "minLength": 1 },
+        "scenario_path_hypotheses": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "changed_surface_scope": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "test_asset_cleanup_scope": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "nodeGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gate_kind", "required_before_success", "notes"],
+      "properties": {
+        "gate_kind": { "type": "string", "enum": ["none", "craft_self_check", "review", "integration", "manual"] },
+        "required_before_success": { "type": "boolean" },
+        "notes": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "checkGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gate_id", "review_target_ids", "source_review_scenario_ids", "source_use_case_claim_ids", "source_route_implementation_detail_ids", "source_cross_cutting_contract_ids", "claim", "source", "minimum_surface", "required_attempt", "pass_condition", "forbidden_substitutes", "if_failed"],
+      "properties": {
+        "gate_id": { "type": "string", "minLength": 1 },
+        "review_target_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "source_review_scenario_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "source_use_case_claim_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "source_route_implementation_detail_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "source_cross_cutting_contract_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "claim": { "type": "string", "minLength": 1 },
+        "source": { "type": "string", "minLength": 1 },
+        "minimum_surface": { "$ref": "#/$defs/surfaceType" },
+        "required_attempt": { "type": "string", "minLength": 1 },
+        "pass_condition": { "type": "string", "minLength": 1 },
+        "forbidden_substitutes": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "if_failed": { "type": "string", "minLength": 1 }
+      }
+    },
+    "nodeRouteCapsule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capsule_id", "status", "source", "local_move", "local_success_signals", "wrong_signs", "handoff_after_completion"],
+      "properties": {
+        "capsule_id": { "type": "string", "minLength": 1 },
+        "status": { "type": "string", "const": "active" },
+        "source": { "type": "string", "const": "chain-plan" },
+        "local_move": { "type": "string", "minLength": 1 },
+        "local_success_signals": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "wrong_signs": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "handoff_after_completion": { "type": "string", "minLength": 1 }
+      }
+    },
+    "mcpPosture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["uses_mcp", "allowed_mcp_actions", "forbidden_local_drivers", "notes"],
+      "properties": {
+        "uses_mcp": { "type": "boolean" },
+        "allowed_mcp_actions": { "type": "array", "items": { "type": "string", "enum": ["observe", "probe", "bounded_action", "collect_artifact"] } },
+        "forbidden_local_drivers": { "type": "array", "minItems": 3, "items": { "type": "string", "minLength": 1 } },
+        "notes": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    }
+  }
+}

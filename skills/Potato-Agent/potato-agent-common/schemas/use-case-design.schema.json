@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "potato-agent/use-case-design.schema.json",
+  "title": "Potato Agent Use-Case Design Index",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "use_case_design_index_format",
+    "module_id",
+    "use_case_design_revision_id",
+    "supersedes_use_case_design_revision_id",
+    "authoritative_markdown_path",
+    "use_case_claims",
+    "out_of_scope_ids",
+    "open_question_ids",
+    "notes"
+  ],
+  "properties": {
+    "use_case_design_index_format": {
+      "type": "string",
+      "const": "potato_agent_use_case_design_index/v4"
+    },
+    "module_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "use_case_design_revision_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "supersedes_use_case_design_revision_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "authoritative_markdown_path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "use_case_claims": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "claim_id",
+          "text",
+          "acceptance_notes"
+        ],
+        "properties": {
+          "claim_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "text": {
+            "type": "string",
+            "description": "Operator-facing claim text. It must state what the user/player/operator should see, do, understand, or get; do not compress the claim into check names, class names, file paths, counters, booleans, or implementation seams.",
+            "minLength": 1
+          },
+          "acceptance_notes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "out_of_scope_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "open_question_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

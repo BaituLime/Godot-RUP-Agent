@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "potato-agent/node-override.schema.json",
+  "title": "Potato Agent Node Override",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["override_format", "session_id", "module_id", "override_id", "source", "source_node_id", "applies_from_node_id", "conclusion_key", "old_conclusion", "new_conclusion", "reason", "basis_refs", "scope_class", "status"],
+  "properties": {
+    "override_format": { "type": "string", "const": "potato_agent_node_override/v2" },
+    "session_id": { "type": "string", "minLength": 1 },
+    "module_id": { "type": "string", "minLength": 1 },
+    "override_id": { "type": "string", "pattern": "^node-override-[0-9]{3}$" },
+    "source": { "type": "string", "enum": ["node_agent_judgment", "user_clarification"] },
+    "source_node_id": { "type": "string", "minLength": 1 },
+    "applies_from_node_id": { "type": "string", "minLength": 1 },
+    "conclusion_key": { "type": "string", "minLength": 1 },
+    "old_conclusion": { "type": "string", "minLength": 1 },
+    "new_conclusion": { "type": "string", "minLength": 1 },
+    "reason": { "type": "string", "minLength": 1 },
+    "basis_refs": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+    "scope_class": { "type": "string", "const": "detail_only" },
+    "status": { "type": "string", "enum": ["proposed", "active", "absorbed_into_replanned_chain", "discarded_during_replan"] },
+    "reviewed_by": { "type": ["string", "null"] },
+    "review_notes": { "type": ["string", "null"] }
+  }
+}

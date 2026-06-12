@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "potato-agent/human-final-review-record.schema.json",
+  "title": "Potato Agent Human Final Review Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["human_final_review_record_format", "session_id", "module_id", "performed", "verdict", "checked_items", "operator_notes", "artifact_refs", "covered_review_scenario_ids", "covered_use_case_claim_ids", "review_scenarios_need_rework", "repair_deltas", "notes"],
+  "properties": {
+    "human_final_review_record_format": { "type": "string", "const": "potato_agent_human_final_review_record/v2" },
+    "session_id": { "type": "string", "minLength": 1 },
+    "module_id": { "type": "string", "minLength": 1 },
+    "performed": { "type": "boolean" },
+    "verdict": { "type": ["string", "null"], "enum": [null, "pass", "fail", "more_checks", "hold"] },
+    "checked_items": { "type": "array", "items": { "$ref": "#/$defs/checkedItem" } },
+    "operator_notes": { "type": "array", "items": { "$ref": "#/$defs/operatorNote" } },
+    "artifact_refs": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "covered_review_scenario_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "covered_use_case_claim_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "review_scenarios_need_rework": { "type": "boolean" },
+    "repair_deltas": { "type": "array", "items": { "$ref": "#/$defs/repairDelta" } },
+    "notes": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+  },
+  "allOf": [
+    { "if": { "properties": { "performed": { "const": false } }, "required": ["performed"] }, "then": { "properties": { "verdict": { "const": null }, "covered_review_scenario_ids": { "maxItems": 0 }, "covered_use_case_claim_ids": { "maxItems": 0 }, "repair_deltas": { "maxItems": 0 } } } },
+    { "if": { "properties": { "verdict": { "const": "pass" } }, "required": ["verdict"] }, "then": { "properties": { "checked_items": { "minItems": 1, "items": { "properties": { "result": { "const": "pass" }, "review_scenario_ids": { "minItems": 1 }, "source_use_case_claim_ids": { "minItems": 1 } } } }, "covered_review_scenario_ids": { "minItems": 1 }, "covered_use_case_claim_ids": { "minItems": 1 }, "repair_deltas": { "maxItems": 0 }, "review_scenarios_need_rework": { "const": false } } } },
+    { "if": { "properties": { "verdict": { "enum": ["fail", "more_checks", "hold"] } }, "required": ["verdict"] }, "then": { "anyOf": [{ "properties": { "repair_deltas": { "minItems": 1 } } }, { "properties": { "operator_notes": { "minItems": 1 } } }, { "properties": { "notes": { "minItems": 1 } } }] } }
+  ],
+  "$defs": {
+    "checkedItem": { "type": "object", "additionalProperties": false, "required": ["operator_action", "expected_visible_outcome", "observed_visible_outcome", "environment_or_build_ref", "result", "review_scenario_ids", "source_use_case_claim_ids"], "properties": { "operator_action": { "type": "string", "minLength": 1 }, "expected_visible_outcome": { "type": "string", "minLength": 1 }, "observed_visible_outcome": { "type": "string", "minLength": 1 }, "environment_or_build_ref": { "type": "string", "minLength": 1 }, "result": { "type": "string", "enum": ["pass", "fail", "not_checked", "unclear"] }, "review_scenario_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "source_use_case_claim_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } } } },
+    "operatorNote": { "type": "object", "additionalProperties": false, "required": ["quote_or_summary", "review_scenario_ids", "source_use_case_claim_ids", "candidate_target_node_ids"], "properties": { "quote_or_summary": { "type": "string", "minLength": 1 }, "review_scenario_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "source_use_case_claim_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "candidate_target_node_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "artifact_refs": { "type": "array", "items": { "type": "string", "minLength": 1 } } } },
+    "repairDelta": { "type": "object", "additionalProperties": false, "required": ["repair_delta_id", "source", "target", "failure_signature", "rejected_substitutes", "required_craft_self_check_gates", "affected_successors"], "properties": { "repair_delta_id": { "type": "string", "minLength": 1 }, "source": { "$ref": "#/$defs/repairDeltaSource" }, "target": { "$ref": "#/$defs/repairDeltaTarget" }, "failure_signature": { "type": "string", "minLength": 1 }, "rejected_substitutes": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "required_craft_self_check_gates": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "affected_successors": { "type": "array", "items": { "$ref": "#/$defs/affectedSuccessor" } } } },
+    "repairDeltaSource": { "type": "object", "additionalProperties": false, "required": ["kind", "node_id", "attempt_ids", "review_target_ids", "review_scenario_ids", "source_use_case_claim_ids", "inspection_finding_ids", "human_final_review_record_path", "technical_final_review_record_path"], "properties": { "kind": { "type": "string", "const": "human_final_review" }, "node_id": { "type": ["string", "null"], "minLength": 1 }, "attempt_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "review_target_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "review_scenario_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "source_use_case_claim_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "inspection_finding_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "human_final_review_record_path": { "type": "string", "minLength": 1 }, "technical_final_review_record_path": { "type": ["string", "null"], "minLength": 1 } } },
+    "repairDeltaTarget": { "type": "object", "additionalProperties": false, "required": ["node_id", "repair_mode"], "properties": { "node_id": { "type": ["string", "null"], "minLength": 1 }, "repair_mode": { "type": "string", "enum": ["craft_repair", "custom_craft_repair", "ask_user", "visible_replanning"] } } },
+    "affectedSuccessor": { "type": "object", "additionalProperties": false, "required": ["node_id", "why_stale", "review_target_ids_to_rerun", "review_scenario_ids_to_recheck", "inspection_focus_to_rerun"], "properties": { "node_id": { "type": "string", "minLength": 1 }, "why_stale": { "type": "string", "minLength": 1 }, "review_target_ids_to_rerun": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "review_scenario_ids_to_recheck": { "type": "array", "items": { "type": "string", "minLength": 1 } }, "inspection_focus_to_rerun": { "type": "array", "items": { "type": "string", "minLength": 1 } } } }
+  }
+}

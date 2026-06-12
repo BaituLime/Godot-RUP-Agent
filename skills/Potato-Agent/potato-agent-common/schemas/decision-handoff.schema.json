@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "potato-agent/decision-handoff.schema.json",
+  "title": "Potato Agent Decision Handoff",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "decision_handoff_format",
+    "module_id",
+    "use_case_design_path",
+    "source_use_case_design_revision_id",
+    "approved_route_id",
+    "selected_route_implementation_details",
+    "cross_cutting_contracts",
+    "open_risks",
+    "decision_gates",
+    "approved_at"
+  ],
+  "properties": {
+    "decision_handoff_format": { "type": "string", "const": "potato_agent_decision_handoff/v10" },
+    "module_id": { "type": "string", "minLength": 1 },
+    "use_case_design_path": { "type": "string", "minLength": 1 },
+    "source_use_case_design_revision_id": { "type": "string", "minLength": 1 },
+    "approved_route_id": { "type": "string", "minLength": 1 },
+    "selected_route_implementation_details": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/routeImplementationDetail" } },
+    "cross_cutting_contracts": { "type": "array", "items": { "$ref": "#/$defs/crossCuttingContract" } },
+    "open_risks": { "type": "array", "items": { "$ref": "#/$defs/openRisk" } },
+    "decision_gates": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/decisionGate" } },
+    "approved_at": { "type": "string", "minLength": 1 }
+  },
+  "allOf": [
+    { "properties": { "decision_gates": { "contains": { "type": "object", "properties": { "kind": { "const": "architecture-route-choice" }, "status": { "const": "approved" } }, "required": ["kind", "status"] } } } },
+    { "properties": { "decision_gates": { "contains": { "type": "object", "properties": { "kind": { "const": "architecture-route-consequence" }, "status": { "const": "approved" } }, "required": ["kind", "status"] } } } }
+  ],
+  "$defs": {
+    "routeImplementationDetail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "implementation_detail_id",
+        "title",
+        "purpose_summary",
+        "source_use_case_claim_ids",
+        "content",
+        "forbidden_simplifications",
+        "technical_final_review_focus"
+      ],
+      "properties": {
+        "implementation_detail_id": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "purpose_summary": { "type": "string", "minLength": 1 },
+        "source_use_case_claim_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "content": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/routeRow" } },
+        "forbidden_simplifications": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/routeRow" } },
+        "technical_final_review_focus": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/tfrFocus" } }
+      }
+    },
+    "crossCuttingContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract_id", "applies_to_implementation_detail_ids", "content"],
+      "properties": {
+        "contract_id": { "type": "string", "minLength": 1 },
+        "applies_to_implementation_detail_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "content": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/routeRow" } }
+      }
+    },
+    "openRisk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["risk_id", "applies_to_implementation_detail_ids", "risk", "required_action"],
+      "properties": {
+        "risk_id": { "type": "string", "minLength": 1 },
+        "applies_to_implementation_detail_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "risk": { "type": "string", "minLength": 1 },
+        "required_action": { "type": "string", "enum": ["spike", "report_during_execution", "user_decision", "monitor_in_review"] }
+      }
+    },
+    "routeRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "text"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "text": { "type": "string", "minLength": 1 }
+      }
+    },
+    "tfrFocus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["focus_id", "focus", "route_authority_refs"],
+      "properties": {
+        "focus_id": { "type": "string", "minLength": 1 },
+        "focus": { "type": "string", "minLength": 1 },
+        "route_authority_refs": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "decisionGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "status", "notes"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": { "type": "string", "enum": ["use-case-design", "architecture-route-choice", "architecture-route-consequence"] },
+        "status": { "type": "string", "enum": ["approved", "pending", "rejected"] },
+        "notes": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}
